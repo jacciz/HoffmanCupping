@@ -1,0 +1,44 @@
+---
+title: "analysis"
+editor: visual
+---
+
+October 22, James Hoffman, youtuber and 201x World Barista Champion, conducted a 5,000 cupping session.
+
+So, who are these coffee connoisseurs? Conducted 4 roasts: \* Natural Process
+
+| A               | B   | C   | D   |
+|-----------------|-----|-----|-----|
+| pic             |     |     |     |
+| Natural Process |     |     |     |
+|                 |     |     |     |
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+df = read.csv("data/GACTT_RESULTS_ANONYMIZED_v2.csv") |> janitor::clean_names()
+
+df = df |> mutate_at(c("what_is_your_age", "gender", "education_level", "ethnicity_race", "political_affiliation"), ~ifelse(. == "", "Not Reported", .))
+                
+                #~tidyr::replace_na(., replace = "Unk"))
+names(df)
+```
+
+```{r}
+# TODO pop pyramid
+df |> mutate(gender = ifelse(gender == "Prefer not to say", "Not Reported", gender)) |> count(what_is_your_age, gender) |> ggplot() + geom_col(aes(x = gender, y = n)) + facet_wrap(~what_is_your_age)
+
+df |> mutate(gender = ifelse(gender == "Prefer not to say", "Not Reported", gender)) |> count(what_is_your_age, gender) |> mutate(
+    population = ifelse(gender=="Male", n*(-1),
+                        n*1)) %>%
+    ggplot(aes(x = what_is_your_age,y = population, fill = gender)) + 
+    geom_bar(stat = "identity") +
+    coord_flip() #+ facet_wrap(~gender)
+```
+
+```{r}
+df |> summary()
+```

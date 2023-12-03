@@ -1,0 +1,290 @@
+---
+title: "coffee"
+format: html
+---
+https://colorbrewer2.org/#type=qualitative&scheme=Set2&n=3
+https://www.infoworld.com/video/108579/r-colors-and-palettes-tips-and-tools q   
+https://cran.r-project.org/web/packages/colorspace/
+(screenshot image)
+Coffee connoisseurs or some may say 'coffee snobs'? Who are they and what are the trends we see today? Let's find out!
+
+The "Great America Taste Test" is what coffee fanatic and British James Hoffman called the live stream coffee cupping event held October 2023. 5,000 kits were shipped out consisting of 4 pods with different roasts and processing profiles. Basically it's flash frozen liquid of concentrated coffee. All the user does is add water, basically assuming that every participant has the exact same coffee.
+
+At the end, particpants were asked to fill out a survey - so let's analyse the results!
+
+Admittedly, this is a greatly biased sample of coffee enthusiasts most likely those leaning who watch YouTube. While U.S. YouTube audience leans female (51%) and worldwide 37% are between the ages of 25-44, that suggests coffee enthusiasts tend to be young and male.
+
+https://datareportal.com/essential-youtube-stats
+https://www.statista.com/statistics/810461/us-youtube-reach-gender/
+
+## Great America Taste Test - 4 coffees
+a light roast from Kenya
+b medium roast blend
+c dark roast blend
+
+d single estate from columbia, fermented coffee , natural process? (fruitiness) 1:56
+compare gender to whole population
+lots more polarizing, esp in females
+1543 national coffee
+pour over and light roast preference
+
+correlation bwn actual pref vs taste pref. roast level can be ambiguous
+
+preference by expertise level
+
+```{r}
+library(ggplot2)
+library(dplyr)
+theme_coffee <- function(base_size = 12, include_legend = FALSE) {
+  # TODO include legend? argument, include lines?
+  # Source: 
+  # https://github.com/Metropolitan-Council/councilR/blob/main/R/theme_council.R
+  
+  requireNamespace("rlang", quietly = TRUE)
+
+  purrr::map(
+    c(base_size),
+    rlang:::check_number_decimal
+  )
+  
+  font_sizes <-
+    list(
+      "title" = ggplot2::rel(1.2),
+      "subtitle" = ggplot2::rel(1.1),
+      "axis_title" = base_size,
+      "axis_text" = ggplot2::rel(0.8),
+      "legend_title" = base_size,
+      "legend_text" = ggplot2::rel(0.8),
+      "caption" = ggplot2::rel(0.8),
+      "strip" = ggplot2::rel(0.8)
+    )
+  
+  font <- "sans" # this is Arial via windowsFonts()
+  half_line <- base_size / 2
+  theme_classic() %+replace%
+    theme(
+      # --- Font ---
+      text = element_text(
+        family = font,
+        size = base_size,
+        # color = "#330066",
+        lineheight = 0.9,
+        hjust = 0.5,
+        vjust = 0.5,
+        angle = 0,
+        margin = ggplot2::margin(),
+        debug = FALSE
+      ),
+      
+      # --- Axis ---
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = ggplot2::element_line(color = "grey92"),
+      axis.ticks.length = ggplot2::unit(half_line / 2, "pt"),
+      axis.text = element_text(
+        family = font,
+        size = font_sizes$axis_text,
+        color = "grey30",
+        margin = ggplot2::margin(t = 0.8 * half_line / 2)
+      ),
+      axis.text.x = element_text(vjust = 0.5),
+      axis.text.y = element_text(hjust = 1),
+      
+      # --- Legend ---
+      legend.background = ggplot2::element_blank(),
+      legend.spacing = ggplot2::unit(2 * half_line, "pt"),
+      legend.spacing.x = NULL,
+      legend.spacing.y = NULL,
+      legend.margin = ggplot2::margin(half_line,
+                                      half_line,
+                                      half_line,
+                                      half_line),
+      legend.key = ggplot2::element_blank(),
+      legend.key.size = ggplot2::unit(1.2, "lines"),
+      legend.key.height = NULL,
+      legend.key.width = NULL,
+      legend.position = "right",# or "none" ?
+      legend.text = element_text(size = font_sizes$legend_text),
+      legend.title = ggtext::element_markdown(size = font_sizes$legend_title, hjust = 0),
+      
+      # --- Faceting ---
+      strip.background = element_rect(fill = "#CCD2D4", colour = "transparent"),
+      strip.text  = element_text(
+        size = font_sizes$strip,
+        hjust = 0,
+        margin = ggplot2::margin(0.4 * half_line,
+                                 0.4 * half_line,
+                                 0.4 * half_line,
+                                 0.4 * half_line)
+      ),
+      
+      # --- Panel lines ---
+      panel.grid = ggplot2::element_line(colour = "grey90"),
+      panel.grid.minor = ggplot2::element_blank(),
+      panel.spacing = ggplot2::unit(half_line, "pt"),
+      panel.grid.major.y = ggplot2::element_line(linewidth = ggplot2::rel(1)),
+      
+      # --- Title and Subtitle ---
+      # plot.title.position = "plot",
+      plot.title = ggtext::element_markdown(
+        family = font,
+        lineheight = 1.1,
+        size = font_sizes$title,
+        hjust = 0,
+        vjust = 1,
+        margin = margin(b = half_line)
+      ),
+      plot.subtitle = element_text(
+        family = font,
+        size = font_sizes$subtitle,
+        hjust = 0,
+        vjust = 1,
+        margin = ggplot2::margin(b = half_line)
+      ),
+      plot.margin = ggplot2::margin(15, 15, 10, 15), #top, right, bottom, left
+      # --- Caption ---
+      plot.caption = element_text(
+        family = font,
+        hjust = 1,
+        vjust = 1,
+        face = "italic",
+        size = font_sizes$caption,
+        color = "grey30",
+        margin = ggplot2::margin(t = half_line)
+      ),
+      plot.title.position = "panel",
+      plot.caption.position =  "panel"
+    )
+}
+```
+
+```{r test}
+# dem = readxl::read_xlsx("data/JC_DEMOGRAPHICS_JZ_20221231_v2.xlsx", col_types = c("text", "text", "text", "date", "numeric", "text", "date", "numeric", "text", "date", "numeric")) |> janitor::clean_names()
+
+# dem |> count(age, generation) |> ggplot((aes(x = age, y = n, color = n))) + geom_point() + labs(title = "Title", subtitle = "Subtitle", caption = "Caption") + theme_coffee(14) + facet_wrap(~generation)
+```
+
+```{r}
+library(gt)
+library(gtExtras)
+df = read.csv("data/GACTT_RESULTS_ANONYMIZED_v2.csv") |> janitor::clean_names()
+df$lastly_how_would_you_rate_your_own_coffee_expertise
+
+age_groups =  c("<18 years old", "18-24 years old", "25-34 years old", "35-44 years old", "45-54 years old", "55-64 years old", ">65 years old", "Unknown") 
+cup_groups = c("0-1 cups", "2-3 cups", "4 or More")
+
+"what_is_your_favorite_coffee_drink"
+"before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like"
+"What.roast.level.of.coffee.do.you.prefer."
+"lastly_how_would_you_rate_your_own_coffee_expertise"
+"lastly_what_was_your_favorite_overall_coffee"
+# each coffee "Bitterness" ".Acidity" "Personal.Preference" "Notes"
+"in_total_much_money_do_you_typically_spend_on_coffee_in_a_month"
+"political_affiliation"
+# Price of these drinks??
+# pour-over - more likely to drink black?
+# perceived acid and roast level - relationship?
+# what is nordic roast?
+
+df = df |>  mutate(
+  total_cups = recode(
+    how_many_cups_of_coffee_do_you_typically_drink_per_day,
+    "Less than 1" = "0-1 cups",
+    "1" = "0-1 cups",
+    "2" = "2-3 cups",
+    "3" = "2-3 cups",
+    "4" = "4 or More",
+    "More than 4" = "4 or More"
+  )) |>
+  mutate_at(
+    c(
+      "what_is_your_age",
+      "how_many_cups_of_coffee_do_you_typically_drink_per_day",
+      "total_cups",
+      "gender"
+    ),
+    ~ ifelse(. == "", "Unknown", .)
+  ) |> mutate(
+    total_cups = factor(total_cups, levels = cup_groups),
+  what_is_your_age = factor(what_is_your_age, levels = age_groups)
+  )
+```
+
+Nearly 3 out of 4 are between ages 25 and 44 years. Interestingly, we see a trend in drinking more cups of coffee per day as one ages. Who said college students drink lots of coffee, maybe we should say it's the retirees who drink far more?
+
+Breaking down gender, participants are overwhelming male. This is unlike the gender U.S. viewers in which 48% are male. Wonder what the audience would be for MorganDrinksCoffee?
+```{r}
+df |> count(gender) |> mutate(perc = n / sum(n)) |> ggplot(aes(gender, perc)) + geom_bar(stat = 'identity') + coord_flip() + theme_coffee()
+# df |> filter(what_is_your_age == "Unknown" | is.na(total_cups)) n = 100
+# Combine these 2 tables
+age_cups_per_day = df |> 
+  filter(what_is_your_age != "Unknown", !is.na(total_cups)) |> 
+  group_by(what_is_your_age) |> 
+  count(total_cups, .drop = FALSE) |> 
+  group_by(what_is_your_age) |> 
+  summarize(list_data = list(n))
+
+age_counts = df |> 
+  filter(what_is_your_age != "Unknown", !is.na(total_cups)) |> 
+  count(what_is_your_age) |> mutate(perc = n * 100 / sum(n), what_is_your_age = factor(what_is_your_age, age_groups))
+
+left_join(age_counts, age_cups_per_day, by = join_by(what_is_your_age)) |> gt(caption = "100 participants were removed due to unanswered questions.") |> gt_plt_bar_stack(list_data, labels = cup_groups) |> gt_theme_538() |> gt_plt_bar_pct(column = perc, scaled = TRUE, fill = "blue", labels = TRUE)
+```
+Most of us has seen tasting notes when it comes to coffee (i.e. grapefruit, chocolate) but are these actually useful? Is there a relationship between tasting notes and roast levels? This is for favorite coffee.
+
+Roast levels, processing method, region, elevation, variety, all play a role in the coffee tasting experience. Below is a flavor wheel, a tool to help identify words for one's taste buds. While these notes, may seem made-up by some, this cupping live stream demonstrates there's actually some commonalities between cupping participants. 
+
+```{r}
+# df |> count(lastly_what_was_your_favorite_overall_coffee, political_affiliation) |> group_by(political_affiliation) |> mutate(perc = n / sum(n)) |> ggplot(aes(lastly_what_was_your_favorite_overall_coffee, perc)) + geom_col() + facet_wrap(~political_affiliation) + theme_coffee(8)
+
+# Flavor profiles do match actual preferences! chi-squ?
+df |> filter(lastly_what_was_your_favorite_overall_coffee != "") |>  count(before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like, lastly_what_was_your_favorite_overall_coffee) |> group_by(lastly_what_was_your_favorite_overall_coffee) |> mutate(perc = n / sum(n)) |> ggplot(aes(before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like, perc)) + geom_col() + facet_grid(rows = vars(lastly_what_was_your_favorite_overall_coffee)) + theme_coffee(8)
+
+coffee_a = df |> filter(lastly_what_was_your_favorite_overall_coffee == "Coffee A") |> count(before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like)
+coffee_b = df |> filter(lastly_what_was_your_favorite_overall_coffee == "Coffee B") |> count(before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like)
+chisq.test(x = coffee_a$n, p = coffee_b$n, rescale.p = TRUE)
+
+# Coffee bitterness
+counts <- purrr::map(
+ c("coffee_a_bitterness", "coffee_b_bitterness", "coffee_c_bitterness", "coffee_d_bitterness"),
+  ~ count(df, score = .data[[.x]], name = .x)
+)
+
+purrr::reduce(counts, left_join) |> tidyr::pivot_longer(cols = starts_with("coffee")) |> ggplot(aes(score, value)) + geom_col() + facet_wrap(~name) + theme_coffee(8)
+
+counts2 <- purrr::map(
+ c("coffee_a_acidity", "coffee_b_acidity", "coffee_c_acidity", "coffee_d_acidity"),
+  ~ count(df, score = .data[[.x]], name = .x)
+)
+
+purrr::reduce(counts2, left_join) |> tidyr::pivot_longer(cols = starts_with("coffee")) |> ggplot(aes(score, value)) + geom_col() + facet_wrap(~name) + theme_coffee(8)
+
+# MONEY SPENT
+money = c("<$20", "$20-$40" , "$40-$60" ,  "$60-$80","$80-$100", ">$100")
+df_money = df |> filter(in_total_much_money_do_you_typically_spend_on_coffee_in_a_month  != "") |> mutate(in_total_much_money_do_you_typically_spend_on_coffee_in_a_month = factor(in_total_much_money_do_you_typically_spend_on_coffee_in_a_month , levels = money))
+
+# More expertise = more money spent, but not for the 10 expertise. Age with expertise??
+# 10 - more likely to drink at home? with a pour over? Think get good value at cafe? Probably spent money in past 5 years?
+df_money |> filter(!is.na(lastly_how_would_you_rate_your_own_coffee_expertise)) |> count(in_total_much_money_do_you_typically_spend_on_coffee_in_a_month, lastly_how_would_you_rate_your_own_coffee_expertise) |> group_by(lastly_how_would_you_rate_your_own_coffee_expertise) |> mutate(perc = n / sum(n)) |> ggplot(aes(lastly_how_would_you_rate_your_own_coffee_expertise, perc)) + geom_col() + facet_wrap(~in_total_much_money_do_you_typically_spend_on_coffee_in_a_month) + theme_coffee(8)
+
+df |> filter(lastly_how_would_you_rate_your_own_coffee_expertise == 10)
+```
+
+```{r text analysis}
+#| fig-cap: Most common words for Coffee D
+coffee_a_words = count_cupping_notes(df$coffee_a_notes)
+coffee_b_words = count_cupping_notes(df$coffee_b_notes)
+coffee_c_words = count_cupping_notes(df$coffee_c_notes)
+coffee_d_words = count_cupping_notes(df$coffee_d_notes)
+
+paste0(names(coffee_a_words[1]), ": ", coffee_a_words[1][[1]])
+paste0(names(coffee_b_words[1]), ": ", coffee_b_words[1][[1]])
+paste0(names(coffee_c_words[1]), ": ", coffee_c_words[1][[1]])
+paste0(names(coffee_d_words[1]), ": ", coffee_d_words[1][[1]])
+# TODO highlight tasting notes in plotly?
+library(wordcloud)
+wordcloud(names(coffee_d_words), coffee_d_words, max.words = 50, random.color = FALSE, colors = brewer.pal(6,"Set2"))
+```
+
+
