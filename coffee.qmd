@@ -35,153 +35,29 @@ preference by expertise level
 ```{r}
 library(ggplot2)
 library(dplyr)
-theme_coffee <- function(base_size = 12, include_legend = FALSE) {
-  # TODO include legend? argument, include lines?
-  # Source: 
-  # https://github.com/Metropolitan-Council/councilR/blob/main/R/theme_council.R
-  
-  requireNamespace("rlang", quietly = TRUE)
-
-  purrr::map(
-    c(base_size),
-    rlang:::check_number_decimal
-  )
-  
-  font_sizes <-
-    list(
-      "title" = ggplot2::rel(1.2),
-      "subtitle" = ggplot2::rel(1.1),
-      "axis_title" = base_size,
-      "axis_text" = ggplot2::rel(0.8),
-      "legend_title" = base_size,
-      "legend_text" = ggplot2::rel(0.8),
-      "caption" = ggplot2::rel(0.8),
-      "strip" = ggplot2::rel(0.8)
-    )
-  
-  font <- "sans" # this is Arial via windowsFonts()
-  half_line <- base_size / 2
-  theme_classic() %+replace%
-    theme(
-      # --- Font ---
-      text = element_text(
-        family = font,
-        size = base_size,
-        # color = "#330066",
-        lineheight = 0.9,
-        hjust = 0.5,
-        vjust = 0.5,
-        angle = 0,
-        margin = ggplot2::margin(),
-        debug = FALSE
-      ),
-      
-      # --- Axis ---
-      axis.title.x = element_blank(),
-      axis.title.y = element_blank(),
-      axis.line = element_blank(),
-      axis.ticks = ggplot2::element_line(color = "grey92"),
-      axis.ticks.length = ggplot2::unit(half_line / 2, "pt"),
-      axis.text = element_text(
-        family = font,
-        size = font_sizes$axis_text,
-        color = "grey30",
-        margin = ggplot2::margin(t = 0.8 * half_line / 2)
-      ),
-      axis.text.x = element_text(vjust = 0.5),
-      axis.text.y = element_text(hjust = 1),
-      
-      # --- Legend ---
-      legend.background = ggplot2::element_blank(),
-      legend.spacing = ggplot2::unit(2 * half_line, "pt"),
-      legend.spacing.x = NULL,
-      legend.spacing.y = NULL,
-      legend.margin = ggplot2::margin(half_line,
-                                      half_line,
-                                      half_line,
-                                      half_line),
-      legend.key = ggplot2::element_blank(),
-      legend.key.size = ggplot2::unit(1.2, "lines"),
-      legend.key.height = NULL,
-      legend.key.width = NULL,
-      legend.position = "right",# or "none" ?
-      legend.text = element_text(size = font_sizes$legend_text),
-      legend.title = ggtext::element_markdown(size = font_sizes$legend_title, hjust = 0),
-      
-      # --- Faceting ---
-      strip.background = element_rect(fill = "#CCD2D4", colour = "transparent"),
-      strip.text  = element_text(
-        size = font_sizes$strip,
-        hjust = 0,
-        margin = ggplot2::margin(0.4 * half_line,
-                                 0.4 * half_line,
-                                 0.4 * half_line,
-                                 0.4 * half_line)
-      ),
-      
-      # --- Panel lines ---
-      panel.grid = ggplot2::element_line(colour = "grey90"),
-      panel.grid.minor = ggplot2::element_blank(),
-      panel.spacing = ggplot2::unit(half_line, "pt"),
-      panel.grid.major.y = ggplot2::element_line(linewidth = ggplot2::rel(1)),
-      
-      # --- Title and Subtitle ---
-      # plot.title.position = "plot",
-      plot.title = ggtext::element_markdown(
-        family = font,
-        lineheight = 1.1,
-        size = font_sizes$title,
-        hjust = 0,
-        vjust = 1,
-        margin = margin(b = half_line)
-      ),
-      plot.subtitle = element_text(
-        family = font,
-        size = font_sizes$subtitle,
-        hjust = 0,
-        vjust = 1,
-        margin = ggplot2::margin(b = half_line)
-      ),
-      plot.margin = ggplot2::margin(15, 15, 10, 15), #top, right, bottom, left
-      # --- Caption ---
-      plot.caption = element_text(
-        family = font,
-        hjust = 1,
-        vjust = 1,
-        face = "italic",
-        size = font_sizes$caption,
-        color = "grey30",
-        margin = ggplot2::margin(t = half_line)
-      ),
-      plot.title.position = "panel",
-      plot.caption.position =  "panel"
-    )
-}
-```
-
-```{r test}
-# dem = readxl::read_xlsx("data/JC_DEMOGRAPHICS_JZ_20221231_v2.xlsx", col_types = c("text", "text", "text", "date", "numeric", "text", "date", "numeric", "text", "date", "numeric")) |> janitor::clean_names()
-
-# dem |> count(age, generation) |> ggplot((aes(x = age, y = n, color = n))) + geom_point() + labs(title = "Title", subtitle = "Subtitle", caption = "Caption") + theme_coffee(14) + facet_wrap(~generation)
+library(plotly)
+source("coffee_functions.R")
+source("theme_functions.R")
 ```
 
 ```{r}
 library(gt)
 library(gtExtras)
 df = read.csv("data/GACTT_RESULTS_ANONYMIZED_v2.csv") |> janitor::clean_names()
-df$lastly_how_would_you_rate_your_own_coffee_expertise
+cup_notes = readxl::read_xlsx("data/coffee-flavors_lexicon.xlsx")
+# df$lastly_how_would_you_rate_your_own_coffee_expertise
 
 age_groups =  c("<18 years old", "18-24 years old", "25-34 years old", "35-44 years old", "45-54 years old", "55-64 years old", ">65 years old", "Unknown") 
 cup_groups = c("0-1 cups", "2-3 cups", "4 or More")
 
-"what_is_your_favorite_coffee_drink"
-"before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like"
-"What.roast.level.of.coffee.do.you.prefer."
-"lastly_how_would_you_rate_your_own_coffee_expertise"
-"lastly_what_was_your_favorite_overall_coffee"
-# each coffee "Bitterness" ".Acidity" "Personal.Preference" "Notes"
-"in_total_much_money_do_you_typically_spend_on_coffee_in_a_month"
-"political_affiliation"
+# "what_is_your_favorite_coffee_drink"
+# "before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like"
+# "What.roast.level.of.coffee.do.you.prefer."
+# "lastly_how_would_you_rate_your_own_coffee_expertise"
+# "lastly_what_was_your_favorite_overall_coffee"
+# # each coffee "Bitterness" ".Acidity" "Personal.Preference" "Notes"
+# "in_total_much_money_do_you_typically_spend_on_coffee_in_a_month"
+# "political_affiliation"
 # Price of these drinks??
 # pour-over - more likely to drink black?
 # perceived acid and roast level - relationship?
@@ -215,6 +91,7 @@ Nearly 3 out of 4 are between ages 25 and 44 years. Interestingly, we see a tren
 
 Breaking down gender, participants are overwhelming male. This is unlike the gender U.S. viewers in which 48% are male. Wonder what the audience would be for MorganDrinksCoffee?
 ```{r}
+#| echo: false
 df |> count(gender) |> mutate(perc = n / sum(n)) |> ggplot(aes(gender, perc)) + geom_bar(stat = 'identity') + coord_flip() + theme_coffee()
 # df |> filter(what_is_your_age == "Unknown" | is.na(total_cups)) n = 100
 # Combine these 2 tables
@@ -236,6 +113,7 @@ Most of us has seen tasting notes when it comes to coffee (i.e. grapefruit, choc
 Roast levels, processing method, region, elevation, variety, all play a role in the coffee tasting experience. Below is a flavor wheel, a tool to help identify words for one's taste buds. While these notes, may seem made-up by some, this cupping live stream demonstrates there's actually some commonalities between cupping participants. 
 
 ```{r}
+#| echo: false
 # df |> count(lastly_what_was_your_favorite_overall_coffee, political_affiliation) |> group_by(political_affiliation) |> mutate(perc = n / sum(n)) |> ggplot(aes(lastly_what_was_your_favorite_overall_coffee, perc)) + geom_col() + facet_wrap(~political_affiliation) + theme_coffee(8)
 
 # Flavor profiles do match actual preferences! chi-squ?
@@ -271,20 +149,33 @@ df_money |> filter(!is.na(lastly_how_would_you_rate_your_own_coffee_expertise)) 
 df |> filter(lastly_how_would_you_rate_your_own_coffee_expertise == 10)
 ```
 
+
 ```{r text analysis}
 #| fig-cap: Most common words for Coffee D
-coffee_a_words = count_cupping_notes(df$coffee_a_notes)
-coffee_b_words = count_cupping_notes(df$coffee_b_notes)
-coffee_c_words = count_cupping_notes(df$coffee_c_notes)
-coffee_d_words = count_cupping_notes(df$coffee_d_notes)
+coffee_a_words = count_cupping_notes(df$coffee_a_notes, count_min = 20)
+coffee_b_words = count_cupping_notes(df$coffee_b_notes, count_min = 20)
+coffee_c_words = count_cupping_notes(df$coffee_c_notes, count_min = 20)
+coffee_d_words = count_cupping_notes(df$coffee_d_notes, count_min = 20)
 
+x = select(df, ends_with("notes"))
 paste0(names(coffee_a_words[1]), ": ", coffee_a_words[1][[1]])
 paste0(names(coffee_b_words[1]), ": ", coffee_b_words[1][[1]])
 paste0(names(coffee_c_words[1]), ": ", coffee_c_words[1][[1]])
 paste0(names(coffee_d_words[1]), ": ", coffee_d_words[1][[1]])
-# TODO highlight tasting notes in plotly?
+
 library(wordcloud)
 wordcloud(names(coffee_d_words), coffee_d_words, max.words = 50, random.color = FALSE, colors = brewer.pal(6,"Set2"))
 ```
+
+
+```{r}
+#| layout-ncol: 2
+#| fig-cap: 
+#|   - "Line Plot 1"
+#|   - "Line Plot 2"
+coffee_a_words |> prepare_words(color = "#ff3d19") |> coffee_words_join(cup_notes, color = "#e5e5e5") |> coffee_sunburst()
+wordcloud(names(coffee_d_words), coffee_d_words, max.words = 50, random.color = FALSE, colors = brewer.pal(6,"Set2"))
+```
+
 
 

@@ -1,96 +1,66 @@
 ---
 title: "tasting_charts"
+format:
+  html: 
+    page-layout: full
+execute: 
+  echo: false
+  warning: false
 ---
 
 
 ```{r}
 library(plotly)
 library(dplyr)
+library(wordcloud)
+source("coffee_functions.R")
 ```
 
 ```{r}
 # coffee_cupping_tasting = read.csv("data/coffee-flavors_lexicon.csv")
-coffee_cupping_tasting = readxl::read_xlsx("data/coffee-flavors_lexicon.xlsx")
+cup_notes = readxl::read_xlsx("data/coffee-flavors_lexicon.xlsx")
+df = read.csv("data/GACTT_RESULTS_ANONYMIZED_v2.csv") |> janitor::clean_names()
 ```
 
 ```{r}
-        # Source: Sensory Lexicon
-flavor_colors = tibble::tribble(~ids, ~color,
-  "Fruity",  "#ee3087",
-  "Sour/Acid", "#e6550d",         #
-  "Alcohol/Fermented",  "#9ecae1",
-  "Green/Vegetative", "#3fa746", #
-  "Stale/Papery", "#fee6ce",  #
-  "Earthy", "#e6550d",   ##
-  "Chemical",  "#9ecae1",  ###
-  "Roasted" , "#747e7d",
-  "Cereal", "#eedaac",
-  "Spices", "#ff6a6d",
-  "Nutty", "#d3a778",
-  "Cocoa" , "#3b281e", # chocolate?
-  "Sweet" , "#f2f4f4",
-  "Floral",  "#abb9dc")
-# TODO remove trace
-coffee_cupping_tasting = coffee_cupping_tasting |> mutate(parent_name = sub("\\-.*", "", parents))
-coffee_cupping_tasting = left_join(coffee_cupping_tasting, flavor_colors, by = c("ids" = "ids"))
-coffee_cupping_tasting <- coffee_cupping_tasting %>% mutate(new_label =paste0("<b>",end_name,": ", "</b>",stringr::str_wrap(labels, width = 30)))
-        # coffee_tasting$name = rownames(coffee_tasting)
-        coffee_cupping_tasting %>% plot_ly() %>% add_trace(
-            marker = list(colors = ~color),
-            type = 'sunburst',
-            ids = ~ids,
-            labels = ~end_name,
-            parents = ~parents,
-            text = ~new_label,
-            textinfo = 'label',  # What shows on the chart
-            hovertemplate = '%{text}',
-            domain = list(column = 1),
-            maxdepth = 3,
-            insidetextorientation = 'radial'
-        ) %>%  
-            layout(# grid = list(columns =2, rows = 1),
-              # colorway = ~color,
-                margin = list(
-                    l = 0,
-                    r = 0,
-                    b = 0,
-                    t = 0
-                )) %>% 
-        as_widget(p)
+#| layout-ncol: 2
+coffee_a_words = count_cupping_notes(df$coffee_a_notes, count_min = 20)
+coffee_b_words = count_cupping_notes(df$coffee_b_notes, count_min = 20)
+# coffee_a_df = prepare_words(coffee_d_words)
+# coffee_a = coffee_words_join(coffee_a_df, coffee_cupping_tasting)
+# Source: World Coffee Research Sensory Lexicon
 
+# wordcloud(names(coffee_a_words), coffee_a_words, max.words = 50, random.color = FALSE, colors = brewer.pal(6,"Set2"))
+# 
+# coffee_a_words |> prepare_words(color = "#ff3d19") |> coffee_words_join(cup_notes, color = "#e5e5e5") |> coffee_sunburst()
+# coffee_b_words |> prepare_words(color = "#ff3d19") |> coffee_words_join(cup_notes, color = "#e5e5e5") |> coffee_sunburst()
+# coffee_c_words |> prepare_words() |> coffee_words_join(cup_notes) |> coffee_sunburst()
+# coffee_d_words |> prepare_words() |> coffee_words_join(cup_notes) |> coffee_sunburst()
 ```
 
 ```{r}
-ibrary(tidyverse)
+#| layout-ncol: 2
+# changes size, took up much larger space, but did miss fruity word
+a = wordcloud2::wordcloud2(coffee_a_words[1:25], fontFamily = "Arial", size = 0.45)
 
-lvl0 <- tibble(name = "Parent", value = 0, level = 0, fill = NA)
+# htmlwidgets::saveWidget(widget = b,
+#                         file = "b.html",
+#                         selfcontained = TRUE)
 
-lvl1 <- df %>%
-    group_by(name) %>%
-    summarise(value = sum(value)) %>%
-    ungroup() %>%
-    mutate(level = 1) %>%
-    mutate(fill = name)
+b = wordcloud2::wordcloud2(coffee_b_words[1:25], fontFamily = "Arial", size = 0.45)
+# b
+htmltools::HTML('<iframe src = "a.html" width = "100%" height = "200"></iframe>')
+htmltools::HTML('<iframe src = "b.html" width = "100%" height = "200"></iframe>')
 
-lvl2 <- df %>%
-    select(name = type, value, fill = name) %>%
-    mutate(level = 2)
+# widgetframe::frameWidget(b, elementId = "b")
+# wordcloud2::wordcloud2(coffee_a_words, fontFamily = "Arial", size = 0.5, gridSize = .5, backgroundColor = "grey")
+# <iframe src = "a.html" width = "1000" height = "1000"></iframe>
+# <iframe src = "b.html" width = "1000" height = "1000"></iframe>
 
-
-bind_rows(lvl0, lvl1, lvl2) %>%
-    mutate(name = as.factor(name) %>% fct_reorder2(fill, value)) %>%
-    arrange(fill, name) %>%
-    mutate(level = as.factor(level)) %>%
-    ggplot(aes(x = level, y = value, fill = fill, alpha = level)) +
-        geom_col(width = 1, color = "gray90", size = 0.25, position = position_stack()) +
-        geom_text(aes(label = name), size = 2.5, position = position_stack(vjust = 0.5)) +
-        coord_polar(theta = "y") +
-        scale_alpha_manual(values = c("0" = 0, "1" = 1, "2" = 0.7), guide = F) +
-        scale_x_discrete(breaks = NULL) +
-        scale_y_continuous(breaks = NULL) +
-        scale_fill_brewer(palette = "Dark2", na.translate = F) +
-        labs(x = NULL, y = NULL) +
-        theme_minimal()
 ```
+
+
+
+
 
 
