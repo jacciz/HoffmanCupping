@@ -3,11 +3,16 @@ title: "tasting_charts"
 format:
   html: 
     page-layout: full
+    embed-resources: true
 execute: 
   echo: false
   warning: false
 ---
-
+Coffee connoisseurs or
+some may say 'coffee snobs'? Who are they and what are the trends we see
+today? Let's find out!
+Admittedly, this is a greatly biased sample of coffee enthusiasts most
+likely those leaning who watch YouTube.
 
 ```{r}
 library(plotly)
@@ -26,6 +31,8 @@ df = read.csv("data/GACTT_RESULTS_ANONYMIZED_v2.csv") |> janitor::clean_names()
 #| layout-ncol: 2
 coffee_a_words = count_cupping_notes(df$coffee_a_notes, count_min = 20)
 coffee_b_words = count_cupping_notes(df$coffee_b_notes, count_min = 20)
+coffee_c_words = count_cupping_notes(df$coffee_c_notes, count_min = 20)
+coffee_d_words = count_cupping_notes(df$coffee_d_notes, count_min = 20)
 # coffee_a_df = prepare_words(coffee_d_words)
 # coffee_a = coffee_words_join(coffee_a_df, coffee_cupping_tasting)
 # Source: World Coffee Research Sensory Lexicon
@@ -38,26 +45,59 @@ coffee_b_words = count_cupping_notes(df$coffee_b_notes, count_min = 20)
 # coffee_d_words |> prepare_words() |> coffee_words_join(cup_notes) |> coffee_sunburst()
 ```
 
+##### Caption One
+
+::: h5
+[Caption two]{float=right}
+:::
+
 ```{r}
 #| layout-ncol: 2
 # changes size, took up much larger space, but did miss fruity word
 a = wordcloud2::wordcloud2(coffee_a_words[1:25], fontFamily = "Arial", size = 0.45)
-
-# htmlwidgets::saveWidget(widget = b,
-#                         file = "b.html",
-#                         selfcontained = TRUE)
-
 b = wordcloud2::wordcloud2(coffee_b_words[1:25], fontFamily = "Arial", size = 0.45)
-# b
-htmltools::HTML('<iframe src = "a.html" width = "100%" height = "200"></iframe>')
-htmltools::HTML('<iframe src = "b.html" width = "100%" height = "200"></iframe>')
+c = wordcloud2::wordcloud2(coffee_c_words[1:25], fontFamily = "Arial", size = 0.45)
+d = wordcloud2::wordcloud2(coffee_d_words[1:25], fontFamily = "Arial", size = 0.45)
 
-# widgetframe::frameWidget(b, elementId = "b")
-# wordcloud2::wordcloud2(coffee_a_words, fontFamily = "Arial", size = 0.5, gridSize = .5, backgroundColor = "grey")
-# <iframe src = "a.html" width = "1000" height = "1000"></iframe>
-# <iframe src = "b.html" width = "1000" height = "1000"></iframe>
+# htmltools::HTML('<iframe src = "/assets/widgets/a.html" width = "100%" height = "200"></iframe>')
+# htmltools::HTML('<iframe src = "/assets/widgets/b.html" width = "100%" height = "200"></iframe>')
 
+save_widget(a)
+save_widget(b)
+save_widget(c)
+save_widget(d)
 ```
+
+```{r}
+all_top = purrr::reduce(
+  list(
+    coffee_a_words[1:25] |> prepare_words(color = "#ff3d19") |> mutate(coffee = "A"),
+    coffee_b_words[1:25] |> prepare_words(color = "#ff3d19") |> mutate(coffee = "B"),
+    coffee_c_words[1:25] |> prepare_words(color = "#ff3d19") |> mutate(coffee = "C"),
+    coffee_d_words[1:25] |> prepare_words(color = "#ff3d19") |> mutate(coffee = "D")
+  ),
+  bind_rows
+)
+
+match_colors = tibble::tribble(~ids, ~color2,
+                                "A  D", "#ee3087",
+                                "A   ", "#ff3d19", # A
+                                "A CD", "#9ecae1",
+                                "ABC ", "#3fa746", #
+                                " B  ", "#ff6a6d", # B
+                                "  C ", "#cf179e", # C
+                                "   D", "#d3a778", # D
+                                "ABCD" ,"#899499",
+                                " BC ", "#abb9dc",
+                               NA, "#e5e5e5")
+
+all_top = all_top |> tidyr::pivot_wider(names_from = coffee, values_from = coffee ) |> mutate_at(1:6, ~tidyr::replace_na(., replace = " ")) |> mutate(match_coffee = paste0(`A`, `B`, `C`, `D`, sep = "")) 
+# TODO function should have a color argument
+all_top |> coffee_words_join(cup_notes, color = "#e5e5e5") |> 
+  left_join(y = match_colors, by = c("match_coffee" = "ids")) |> 
+  coffee_sunburst(mcolor = ~color2, hover = ~match_coffee)
+```
+
 
 
 

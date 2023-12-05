@@ -13,6 +13,15 @@ flavor_colors = tibble::tribble(~ids, ~color,
                                 "Cocoa" , "#3b281e", # chocolate?
                                 "Sweet" , "#f2f4f4",
                                 "Floral",  "#abb9dc")
+# Used to save wordcloud
+save_widget <- function(wd) {
+  htmlwidgets::saveWidget(
+    widget = wd,
+    file = paste0("assets/widgets/",deparse(substitute(wd)), ".html"),
+    selfcontained = TRUE
+  )
+}
+
 
 find_two_words <- function(str, two_word){
   c = stringi::stri_count_regex(str, pattern = two_word)
@@ -30,11 +39,21 @@ count_cupping_notes <-
                      "much", "tasted", "like", "almost", "tastes", "cup", "flavors", "slightly", "slight", "liked",
                      "just", "tasting", "note", "notes", "also", "what", "maybe", "from", "similar", "its", "didnt",
                      "could", "all", "coffee", "coffees", "which", "probably", "something", "way", "dont", "did",
-                     "lot", "over", "have", "process", "time", "down", "brown")
+                     "lot", "over", "have", "process", "time", "down", "brown", "green", "mouthfeel", "body", "cool",
+                     "cools", "cooled")
     
     # The first part of each regex will be used to count later on (i.e. black tea)
-    two_words = c("brown sugar", "black tea|tea like|tea-like|tealike", "olive oil|olives", "dark chocolate|dark choc|dark chocolatey")
-
+    two_words = c(
+      "brown sugar",
+      "black tea|tea like|tea-like|tealike",
+      "olive oil|olives",
+      "dark chocolate|dark choc|dark chocolatey",
+      "green apple|green apples",
+      "full body|high body|heavy body|heavier body|fuller body",
+      "medium body",
+      "light body|lighter body|little body|low body"
+    )
+    
     # find_two_words(word, "brown sugar")
     # two_words_counts = purrr::map(two_words, find_two_words, str = word) |> unlist()
     # two_words_counts = sub("\\|.*", "", two_words_counts)
@@ -73,7 +92,7 @@ count_cupping_notes <-
         "^nuts$|^nut$",
         "^darker$",
         "sweetness",
-        "^cool$|^cools$",
+        # "^cool$|^cools$",
         "fermenty",
         "^funk$",
         "^love$",
@@ -84,7 +103,15 @@ count_cupping_notes <-
         "^wine$",
         "^cloves$",
         "paper",
-        "herby|herbed|herb|herbs" # replace dark chocolate with nothing
+        "^lemony$|lemonade",
+        "herby|herbed|herb|herbs", # replace dark chocolate with nothing
+        "peanuts",
+        "hazelnuts",
+        "grainy|grains",
+        "malty",
+        "vegetable|vegetables|vegetal|vegetabley",
+        "raisins",
+        "bananas"
       ),
       replacement = c(
         "",
@@ -106,7 +133,7 @@ count_cupping_notes <-
         "nutty",
         "dark",
         "sweet",
-        "cooled",
+        # "cooled",
         "fermented",
         "funky",
         "loved",
@@ -117,7 +144,15 @@ count_cupping_notes <-
         "winey",
         "clove",
         "papery",
-        "herb-like"
+        "lemon",
+        "herb-like",
+        "peanut",
+        "hazelnut",
+        "grain",
+        "malt",
+        "vegetative",
+        "raisin",
+        "banana"
       ),
       vectorize_all = FALSE
     )
@@ -145,31 +180,30 @@ prepare_words <- function(coffee_words, color = "#000") {
       "Caramel" = "Caramelized",
       "Citrus" = "Citrus Fruit",
       Vegetal = "Vegetative",
-      "Papery" = "Stale/Papery"
+      "Papery" = "Stale/Papery",
+      "Apple" = "Green Apple"
     )
   )
   return(coffee_df)
 }
 
-coffee_sunburst <- function(coffee_cup_df) {
-  # coffee_cupping_tasting = coffee_cupping_tasting |> mutate(parent_name = sub("\\-.*", "", parents))
-  # coffee_cupping_tasting = left_join(coffee_cupping_tasting, flavor_colors, by = c("ids" = "ids"))
-  coffee_cup_df <-
-    coffee_cup_df |> mutate(new_label = paste0(
-      "<b>",
-      end_name,
-      ": ",
-      "</b>",
-      ifelse(is.na(labels), "", stringr::str_wrap(labels, width = 30))
-    ))
+coffee_sunburst <- function(coffee_cup_df, mcolor = ~color, hover = ~new_label) {
+  # coffee_cup_df <-
+  #   coffee_cup_df |> mutate(new_label = paste0(
+  #     "<b>",
+  #     end_name,
+  #     ": ",
+  #     "</b>",
+  #     ifelse(is.na(labels), "", stringr::str_wrap(labels, width = 30))
+  #   ))
 
   coffee_cup_df |> plot_ly() |> add_trace(
-    marker = list(colors = ~ color),
+    marker = list(colors = mcolor),
     type = 'sunburst',
     ids = ~ ids,
     labels = ~ end_name,
     parents = ~ parents,
-    text = ~ new_label,
+    text = hover,
     textinfo = 'label',
     # What shows on the chart
     hovertemplate = '%{text}<extra></extra>',
