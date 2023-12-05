@@ -49,9 +49,9 @@ count_cupping_notes <-
       "olive oil|olives",
       "dark chocolate|dark choc|dark chocolatey",
       "green apple|green apples",
-      "full body|high body|heavy body|heavier body|fuller body",
-      "medium body",
-      "light body|lighter body|little body|low body"
+      "full body|high body|heavy body|heavier body|fuller body|full bodied|full-bodied",
+      "medium body|medium bodied",
+      "light body|lighter body|little body|low body|light bodied"
     )
     
     # find_two_words(word, "brown sugar")

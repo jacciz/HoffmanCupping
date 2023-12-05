@@ -1,30 +1,44 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "HoffmanCupping",
+    "objectID": "tasting_charts.html",
+    "href": "tasting_charts.html",
+    "title": "tasting_charts",
     "section": "",
-    "text": "Post With Code\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nNov 24, 2023\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nNov 21, 2023\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+    "text": "Caption One\n\n\nCaption two"
   },
   {
-    "objectID": "posts/post-with-code/index.html",
-    "href": "posts/post-with-code/index.html",
-    "title": "Post With Code",
+    "objectID": "coffee.html",
+    "href": "coffee.html",
+    "title": "James Hoffman: Analysis of ‘The Great American Coffee Taste Test Live Stream’",
     "section": "",
-    "text": "This is a post with executable code.\n\n1 + 1\n\n[1] 2"
+    "text": "https://colorbrewer2.org/#type=qualitative&scheme=Set2&n=3 https://www.infoworld.com/video/108579/r-colors-and-palettes-tips-and-tools q\nhttps://cran.r-project.org/web/packages/colorspace/\nCoffee connoisseurs or some may say ‘coffee snobs’? Who are they and what are the trends we see today? Let’s find out!\nThe “Great America Taste Test” is what coffee fanatic and British James Hoffman called the live stream coffee cupping event held in October 2023. 5,000 Americans participated in this simultaneous sipping event. Kits were shipped out consisting of 4 pods with different roasts and processing profiles. Basically it’s flash frozen liquid of concentrated coffee. All the user does is add water, basically assuming that every participant has the exact same coffee.\nAt the end, participants were asked to fill out a survey - so let’s analyze the results!\nAdmittedly, this is a greatly biased sample of coffee enthusiasts most likely those leaning who watch YouTube. While U.S. YouTube audience leans female (51%) and worldwide 37% are between the ages of 25-44, that suggests coffee enthusiasts tend to be young and male.\nhttps://datareportal.com/essential-youtube-stats https://www.statista.com/statistics/810461/us-youtube-reach-gender/"
   },
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this blog"
+    "objectID": "coffee.html#great-america-taste-test---4-coffees",
+    "href": "coffee.html#great-america-taste-test---4-coffees",
+    "title": "James Hoffman: Analysis of ‘The Great American Coffee Taste Test Live Stream’",
+    "section": "Great America Taste Test - 4 coffees",
+    "text": "Great America Taste Test - 4 coffees\n\n\n\nCoffee\nRoast Level\nOrigin\n\n\n\n\nCoffee A\nLight\nSingle - Kenya\n\n\nCoffee B\nMedium\nBlend\n\n\nCoffee C\nDark Roast\nBlend\n\n\nCoffee D\nLight?\nSingle - Columbia\n\n\n\nCoffee D I think was added to be a unique coffee. The processing method is a bit different.\nBased on these profiles, how do you think the taste will be?\nd single estate from columbia, fermented coffee , natural process? (fruitiness) 1:56 compare gender to whole population lots more polarizing, esp in females 1543 national coffee pour over and light roast preference\ncorrelation bwn actual pref vs taste pref. roast level can be ambiguous\npreference by expertise level"
   },
   {
-    "objectID": "posts/welcome/index.html",
-    "href": "posts/welcome/index.html",
-    "title": "Welcome To My Blog",
-    "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+    "objectID": "coffee.html#demographics",
+    "href": "coffee.html#demographics",
+    "title": "James Hoffman: Analysis of ‘The Great American Coffee Taste Test Live Stream’",
+    "section": "Demographics",
+    "text": "Demographics\nNearly 3 out of 4 are between ages 25 and 44 years. Interestingly, we see a trend in drinking more cups of coffee per day as one ages. Who said college students drink lots of coffee, maybe we should say it’s the retirees who drink far more?\nBreaking down gender, participants are overwhelming male. This is unlike the gender U.S. viewers in which 48% are male. Wonder what the audience would be for MorganDrinksCoffee?\n\n\n\n\nRespondents by Gender\n\n\n\n\n\n\n\n\n\n\n\n100 participants were removed due to unanswered questions. {#tbl-anonymous-6831167-1}\n\n\nwhat_is_your_age\nn\nperc\n\n0-1 cups||2-3 cups||4 or More\n\n\n\n\n\n&lt;18 years old\n19\n\n\n0.5%\n\n\n\n\n\n   1180\n\n\n\n18-24 years old\n447\n\n\n11.3%\n\n\n\n\n\n   23619318\n\n\n\n25-34 years old\n1956\n\n\n49.6%\n\n\n\n\n\n   8651K57\n\n\n\n35-44 years old\n948\n\n\n24%\n\n\n\n\n\n   33955950\n\n\n\n45-54 years old\n296\n\n\n7.5%\n\n\n\n\n\n   10116827\n\n\n\n55-64 years old\n182\n\n\n4.6%\n\n\n\n\n\n   4511621\n\n\n\n&gt;65 years old\n94\n\n\n2.4%\n\n\n\n\n\n   265414\n\n\n\n\n\n\n\nRespondent Age and Daily Drinking Habits"
+  },
+  {
+    "objectID": "coffee.html#spending-habits",
+    "href": "coffee.html#spending-habits",
+    "title": "James Hoffman: Analysis of ‘The Great American Coffee Taste Test Live Stream’",
+    "section": "Spending Habits",
+    "text": "Spending Habits"
+  },
+  {
+    "objectID": "coffee.html#coffee-cupping",
+    "href": "coffee.html#coffee-cupping",
+    "title": "James Hoffman: Analysis of ‘The Great American Coffee Taste Test Live Stream’",
+    "section": "Coffee Cupping",
+    "text": "Coffee Cupping\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nMost of us have probaby seen tasting notes when it comes to purchasing coffee (i.e. grapefruit, chocolate) but are these actually descriptive? Is there a relationship between tasting notes and roast levels? This is for favorite coffee.\nRoast levels, processing method, region, elevation, variety, all play a role in the coffee tasting experience. Below is a flavor wheel, a tool to help identify words for one’s taste buds.\n(wheel) This cupping live stream demonstrates there’s actually some commonalities between tasting by the cupping participants.\nParticipants were asked to describe the coffee flavors in an open text field. I did a text analysis by identifying and counting key flavor words, such as ‘bright’ or ‘grapefruit.’ I took the top 25 most frequent words and made a word cloud. The larger the word, the frequent the word was mentioned.\nCoffee A conjures up images of something light and fruity. While Coffee B and Coffee C using ‘chocolate’ and ‘nutty’ as common descriptors and a few even described it as burnt. Coffee C has more of a spread in word counts.\nCoffee D, however, paints a different image. ‘Fermented’ and ‘funky’ made it to the top - given this was a natural processed coffee this is not surprising!\n\n\n\nCoffee A: Fruity: 616 Respondents\n\n\n\n\n\n\nCoffee B: Chocolate: 600 Respondents\n\n\n\n\n\n\n\n\nCoffee C: Chocolate: 332 Respondents\n\n\n\n\n\n\nCoffee D: Fruity: 1,085 Respondents\n\n\n\n\n\nOkay - so let’s see how these tasting notes match up on the flavor wheel. ‘Acid’, ‘Sweet’, ‘Fruit’, and ‘Chocolate’ are common words used to describe all 4 coffees. However, they were used at different frequencies. We do see a pattern for Coffees A and D compared to Coffees B and C.\n\n\n\n\nOverlapping Taste Notes"
   }
 ]
