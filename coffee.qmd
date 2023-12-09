@@ -96,12 +96,19 @@ participant tasted nearly the exact same coffee profile.
 ```{r}
 
 coffee_types = data.frame(Coffee = c("Coffee A", "Coffee B", "Coffee C", "Coffee D"), "Roast Level" = c("Light", "Medium", "Dark", "Light"), Origin = c("Single - Kenya", "Multiple - Blend", "Multiple - Blend", "Single - Columbia"))
-coffee_types = left_join(coffee_types, coffee_colors, by = c("Coffee" = "coffee_type"))
-
-# HTML("<p class = .coffeed>Coffee D</p>")
-coffee_types |> mutate(Coffee = gt::html("<p color:green>Coffee D</p>")) |> gt() |> gt_theme_538()
-coffee_types |> mutate(Coffee = gt::html("<span class=.coffeea>Coffee D</span>")) |> gt() |> gt_theme_538()
-coffee_types |> mutate(Coffee = gt::html("<span class:coffeea>Coffee D</span>")) |> gt() |> gt_theme_538()
+# coffee_types = left_join(coffee_types, coffee_colors, by = c("Coffee" = "coffee_type"))
+coffee_types |> gt() |> gt_theme_538() |> gt::text_transform(
+    locations = cells_body(
+      columns = c(Coffee)
+    ),
+    fn = function(x){
+      color = filter(coffee_colors, coffee_type == x)$color_code
+      name <- x
+      # team <- word(x, -1)
+      glue::glue(
+        "<div><span style='font-weight:bold;color:{color}'>{name}</div>"
+      )
+    })
 ```
 
 
@@ -283,7 +290,7 @@ Participants were asked to describe the coffee flavors in an open text field. I 
 <div id="parent">
 <div id="child-left">
 <p class="wc_cap">[Coffee C]{.coffeec}: Chocolate: 332 Respondents</p>
-<iframe src = "/assets/widgets/c.html" width = "90%" height = "200"></iframe></div>
+<iframe src = "/assets/widgets/c.html" width = "90%" height = "190"></iframe></div>
 <div id="child-right">
 <p class="wc_cap">[Coffee D]{.coffeed}: Fruity: 1,085 Respondents</p>
 <iframe src = "/assets/widgets/d.html" width = "100%" height = "200"></iframe></div>

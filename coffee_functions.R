@@ -1,3 +1,27 @@
+coffee_colors <- tibble::tribble(
+  ~coffee_type,  ~color_code,
+  "Coffee A",  "#E41A1C",
+  "Coffee B",  "#377EB8",
+  "Coffee C",  "#4DAF4A",
+  "Coffee D",  "#984EA3"
+)
+
+coffee_pal <- coffee_colors$color_code
+names(coffee_pal) <- coffee_colors$coffee_type
+# tmaptools::get_brewer_pal("Set1", n = 10) |> list()
+
+match_colors = tibble::tribble(~ids, ~color2,
+                               "A  D", "#FFB716",
+                               "A   ", "#E41A1C", # A
+                               "A CD", "#9ecae1",
+                               "ABC ", "#FF7F00", # 
+                               " B  ", "#377EB8", # B
+                               "  C ", "#4DAF4A", # C
+                               "   D", "#F781BF", # D
+                               "ABCD" ,"#7E6E85",
+                               " BC ", "#A65628",
+                               NA, "#e5e5e5")
+
 flavor_colors = tibble::tribble(~ids, ~color,
                                 "Fruity",  "#ee3087",
                                 "Sour/Acid", "#e6550d",         #

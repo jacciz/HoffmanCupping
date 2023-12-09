@@ -1,0 +1,38 @@
+---
+title: "test"
+editor: visual
+---
+
+```{r}
+library(gt)
+library(gtExtras)
+library(dplyr)
+source("coffee_functions.R")
+source("theme_functions.R")
+df = read.csv("data/GACTT_RESULTS_ANONYMIZED_v2.csv") |> janitor::clean_names()
+coffee_types = data.frame(Coffee = c("Coffee A", "Coffee B", "Coffee C", "Coffee D"), "Roast Level" = c("Light", "Medium", "Dark", "Light"), Origin = c("Single - Kenya", "Multiple - Blend", "Multiple - Blend", "Single - Columbia"))
+coffee_types = left_join(coffee_types, coffee_colors, by = c("Coffee" = "coffee_type"))
+
+coffee_colors <- tibble::tribble(
+  ~coffee_type,  ~color_code,
+  "Coffee A",  "#E41A1C",
+  "Coffee B",  "#377EB8",
+  "Coffee C",  "#4DAF4A",
+  "Coffee D",  "#984EA3"
+)
+
+# HTML("<p class = .coffeed>Coffee D</p>")
+coffee_types |> gt() |> gt_theme_538() |> gt::text_transform(
+    locations = cells_body(
+      columns = c(Coffee)
+    ),
+    fn = function(x){
+      color = filter(coffee_colors, coffee_type == x)$color_code
+      print(x)
+      name <- x
+      # team <- word(x, -1)
+      glue::glue(
+        "<div><span style='font-weight:bold;color:{color}'>{name}</div>"
+      )
+    })
+```

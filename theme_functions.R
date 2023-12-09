@@ -24,7 +24,7 @@ theme_coffee <- function(base_size = 12, include_legend = FALSE) {
   
   font <- "sans" # this is Arial via windowsFonts()
   half_line <- base_size / 2
-  theme_classic() %+replace%
+  p = theme_classic() %+replace%
     theme(
       # --- Font ---
       text = element_text(
@@ -119,4 +119,8 @@ theme_coffee <- function(base_size = 12, include_legend = FALSE) {
       plot.title.position = "panel",
       plot.caption.position =  "panel"
     )
+  if(include_legend == FALSE){
+    p = p %+replace% theme(legend.position = "none")
+  }
+  return(p)
 }

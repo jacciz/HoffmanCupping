@@ -11,8 +11,31 @@
     width: 50%;
 }
 
+.coffeea{
+  color: #E41A1C;
+  font-weight: 600;
+}
+.coffeeb{
+  color: #377EB8;
+  font-weight: 600;
+}
 
+.coffeec{
+  color: #4DAF4A;
+  font-weight: 600;
+}
 
+.coffeed{
+  color: #984EA3;
+  font-weight: 600;
+}
+
+.centerimg {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
 body {
   font-family: Arial;
 }
