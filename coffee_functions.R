@@ -17,8 +17,8 @@ match_colors = tibble::tribble(~ids, ~color2,
                                "ABC ", "#FF7F00", # 
                                " B  ", "#377EB8", # B
                                "  C ", "#4DAF4A", # C
-                               "   D", "#F781BF", # D
-                               "ABCD" ,"#7E6E85",
+                               "   D", "#984EA3", # D
+                               "ABCD" ,"#808080",
                                " BC ", "#A65628",
                                NA, "#e5e5e5")
 
@@ -37,6 +37,50 @@ flavor_colors = tibble::tribble(~ids, ~color,
                                 "Cocoa" , "#3b281e", # chocolate?
                                 "Sweet" , "#f2f4f4",
                                 "Floral",  "#abb9dc")
+
+gg_bars <-
+  function(df,
+           x_axis,
+           y_axis,
+           fill = NULL, # what to fill by
+           y_label_type = scales::percent,
+           bar_label_type = scales::percent_format(accuracy = 1),
+           single_color = FALSE, # If bars are one color or follow a palette
+           bar_color = NULL, # single_color must be TRUE
+           base_size = 12) {
+    max_lim = max(df[[{{  y_axis  }}]], na.rm = TRUE) * 1.1
+    
+    if (single_color == FALSE) {
+     p <- ggplot(df, aes(!!sym(x_axis), !!sym(y_axis), fill = !!sym(fill))) +
+       geom_col() +
+      geom_text(
+        aes(label = bar_label_type(!!sym(y_axis)), color = !!sym(fill)),
+        fontface = "bold",
+        vjust = -0.4,
+        size = base_size * (4/14)
+      ) 
+    }
+    else{
+      p <- ggplot(df, aes(!!sym(x_axis), !!sym(y_axis))) +
+        geom_col(fill = bar_color) +
+        geom_text(
+          aes(label = bar_label_type(!!sym(y_axis))),
+          color = bar_color,
+          fontface = "bold",
+          vjust = -0.4,
+          size = base_size * (4/14)
+        ) 
+    }
+    return(
+      p + theme_coffee(base_size) +
+        scale_y_continuous(
+          expand = c(0, 0),
+          limits = c(0, max_lim),
+          labels = y_label_type
+        )
+    )
+  }
+
 # Used to save wordcloud
 save_widget <- function(wd) {
   htmlwidgets::saveWidget(
@@ -46,6 +90,20 @@ save_widget <- function(wd) {
   )
 }
 
+gt_add_coffee_color <- function(gt, coff_col){
+  gt |> gt::text_transform(
+    locations = cells_body(
+      columns = !!sym(coff_col)
+    ),
+    fn = function(x){
+      color = filter(coffee_colors, coffee_type == x)$color_code
+      name <- x
+      # team <- word(x, -1)
+      glue::glue(
+        "<div><span style='font-weight:bold;color:{color}'>{name}</div>"
+      )
+    })
+}
 
 find_two_words <- function(str, two_word){
   c = stringi::stri_count_regex(str, pattern = two_word)

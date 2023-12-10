@@ -1,38 +1,36 @@
 ---
 title: "test"
-editor: visual
+format: 
+  html:
+    fig-cap-location: top
+    tbl-cap-location: top
+execute:
+  echo: false
+  warning: false
 ---
 
 ```{r}
 library(gt)
 library(gtExtras)
 library(dplyr)
+library(ggplot2)
 source("coffee_functions.R")
 source("theme_functions.R")
 df = read.csv("data/GACTT_RESULTS_ANONYMIZED_v2.csv") |> janitor::clean_names()
-coffee_types = data.frame(Coffee = c("Coffee A", "Coffee B", "Coffee C", "Coffee D"), "Roast Level" = c("Light", "Medium", "Dark", "Light"), Origin = c("Single - Kenya", "Multiple - Blend", "Multiple - Blend", "Single - Columbia"))
-coffee_types = left_join(coffee_types, coffee_colors, by = c("Coffee" = "coffee_type"))
+```
 
-coffee_colors <- tibble::tribble(
-  ~coffee_type,  ~color_code,
-  "Coffee A",  "#E41A1C",
-  "Coffee B",  "#377EB8",
-  "Coffee C",  "#4DAF4A",
-  "Coffee D",  "#984EA3"
-)
+```{r}
+#| layout-ncol: 2
+#| fig-height: 4
+#| fig-cap:
+#|   - "Self-Rated Coffee Expertise"
+#|   - "Caption 2"
+#| fig-subcap:
+#|   - 104 participants did not answer this question
+#|   - subcap 2
 
-# HTML("<p class = .coffeed>Coffee D</p>")
-coffee_types |> gt() |> gt_theme_538() |> gt::text_transform(
-    locations = cells_body(
-      columns = c(Coffee)
-    ),
-    fn = function(x){
-      color = filter(coffee_colors, coffee_type == x)$color_code
-      print(x)
-      name <- x
-      # team <- word(x, -1)
-      glue::glue(
-        "<div><span style='font-weight:bold;color:{color}'>{name}</div>"
-      )
-    })
+# df[lastly_how_would_you_rate_your_own_coffee_expertise %in% c(6,7), .N] / nrow(df |> filter(!is.na(exp_group)) )
+df |> filter(!is.na(lastly_how_would_you_rate_your_own_coffee_expertise)) |> count(lastly_how_would_you_rate_your_own_coffee_expertise) |> mutate(perc = n / sum(n), lastly_how_would_you_rate_your_own_coffee_expertise = factor(lastly_how_would_you_rate_your_own_coffee_expertise, levels = c(1:10))) |> gg_bars( "lastly_how_would_you_rate_your_own_coffee_expertise", "n", single_color = TRUE, base_size = 22, bar_label_type = scales::comma, y_label_type = scales::comma, bar_color = "steelblue")
+
+df |> filter(!is.na(lastly_how_would_you_rate_your_own_coffee_expertise)) |> count(lastly_how_would_you_rate_your_own_coffee_expertise) |> mutate(perc = n / sum(n)) |> gg_bars( "lastly_how_would_you_rate_your_own_coffee_expertise", "perc", base_size = 20, single_color = TRUE, bar_color = "steelblue") + scale_x_continuous(breaks = c(1:10))
 ```
