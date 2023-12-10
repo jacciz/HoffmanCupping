@@ -14,23 +14,25 @@ library(gt)
 library(gtExtras)
 library(dplyr)
 library(ggplot2)
+library(data.table)
 source("coffee_functions.R")
 source("theme_functions.R")
 df = read.csv("data/GACTT_RESULTS_ANONYMIZED_v2.csv") |> janitor::clean_names()
+setDT(df)
 ```
 
 ```{r}
-#| layout-ncol: 2
-#| fig-height: 4
-#| fig-cap:
-#|   - "Self-Rated Coffee Expertise"
-#|   - "Caption 2"
-#| fig-subcap:
-#|   - 104 participants did not answer this question
-#|   - subcap 2
-
-# df[lastly_how_would_you_rate_your_own_coffee_expertise %in% c(6,7), .N] / nrow(df |> filter(!is.na(exp_group)) )
-df |> filter(!is.na(lastly_how_would_you_rate_your_own_coffee_expertise)) |> count(lastly_how_would_you_rate_your_own_coffee_expertise) |> mutate(perc = n / sum(n), lastly_how_would_you_rate_your_own_coffee_expertise = factor(lastly_how_would_you_rate_your_own_coffee_expertise, levels = c(1:10))) |> gg_bars( "lastly_how_would_you_rate_your_own_coffee_expertise", "n", single_color = TRUE, base_size = 22, bar_label_type = scales::comma, y_label_type = scales::comma, bar_color = "steelblue")
-
-df |> filter(!is.na(lastly_how_would_you_rate_your_own_coffee_expertise)) |> count(lastly_how_would_you_rate_your_own_coffee_expertise) |> mutate(perc = n / sum(n)) |> gg_bars( "lastly_how_would_you_rate_your_own_coffee_expertise", "perc", base_size = 20, single_color = TRUE, bar_color = "steelblue") + scale_x_continuous(breaks = c(1:10))
+#| fig-cap: caption
+#| fig-subcap: subcap
+x = mtcars |>head() |> select(1:5)  |> gt()
+gtExtras::gt_two_column_layout(list(x, x))
 ```
+
+```{r}
+#| fig-cap: caption2
+#| fig-subcap: subcap2
+mtcars |>head()  |> gt()
+```
+
+Tezt
+
