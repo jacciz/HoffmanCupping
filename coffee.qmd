@@ -13,34 +13,10 @@ editor:
   markdown: 
     wrap: 72
 ---
-wordcloud c - adjust size - or render it smaller?
-change h2 color
-gt font size
-paragraph line spacing
+wordcloud c - adjust size
 
-1:56 compare gender to whole population lots more
-polarizing, esp in females 1543 national coffee pour over and light
-roast preference
-subcap instead of caption?
-italic for word cloud title
-Roast levels, processing method, region, elevation, variety, all play a role in the coffee tasting experience. 
-
-"what_is_your_favorite_coffee_drink"
-"before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like"
-"What.roast.level.of.coffee.do.you.prefer."
-Price of these drinks??
-pour-over - more likely to drink black?
-perceived acid and roast level - relationship?
-
-correlation bwn actual pref vs taste pref. roast level can be ambiguous
-
-preference by expertise level
-
-https://colorbrewer2.org/#type=qualitative&scheme=Set2&n=3
-https://www.infoworld.com/video/108579/r-colors-and-palettes-tips-and-tools
-q\
-https://cran.r-project.org/web/packages/colorspace/
-<br>
+Roast levels, processing method, region, elevation, variety, all play a role in the coffee tasting experience.   
+To ensure every participant tasted nearly the exact same coffee profile, coffee pods were shipped flash frozen liquid of concentrated coffee, needing only to add hot water.
 ------------------------------------------------------------------------
 
 ```{r load libraries and functions}
@@ -52,7 +28,7 @@ library(gtExtras)
 library(data.table)
 library(scales)
 source("coffee_functions.R")
-source("theme_functions.R")
+source("theme_functions.R") #tmaptools - palette_explorer() paletti to set your own palette
 ```
 
 ```{r load and clean data}
@@ -129,48 +105,46 @@ df = df |> mutate_at(
    "Other (please specify)" = "Unknown",
     "Prefer not to say" = "Unknown")
 )
-
 ```
 
 The "Great America Taste Test" is what coffee expert and British **YouTuber James
-Hoffman** called the live stream coffee tasting event held in October
-2023. 5,000 Americans participated in this simultaneous coffee sipping event where each participant tasted the same four coffees. They were then asked to fill out a survey with around 10 questions ranging from coffee drinking habits to describing the coffee flavors of the four coffees.
+Hoffman** called the [live stream coffee tasting event](https://www.youtube.com/watch?v=U489K2t_Tgc&t) held in October
+2023. 5,000 Americans participated in this simultaneous coffee sipping event where each participant tasted the same four coffees. They were then asked to fill out a survey of around 100 questions ranging from coffee drinking habits to describing the coffee flavors of the four coffees.
 
 ![](assets/maxresdefault.jpg){.centerimg height=250px}
 
-I decided to analyze the results! I performed a text analysis of the coffees tasted and looked at the demographics and coffee habits of the participants. Here I looked at standard bitterness and acidity in each coffee then I went deeper to find if there were commonalities in coffee flavor notes via a text analysis. Of the 5,000 participants, a survey was completed by 4,042 of them.
+Being a coffee nerd, I decided to analyze the results! James did do a [follow-up video](https://www.youtube.com/watch?v=bMOOQfeloH0&t) on his own analysis on the survey so I don't want to overlap too much on his findings.
+
+So I performed a text analysis of the coffees tasted and looked at the demographics and coffee habits of the participants. Here I looked at standard bitterness and acidity in each coffee then I went deeper to find if there were commonalities in coffee flavor notes via a text analysis. Of the 5,000 participants, a survey was completed by 4,042 of them.
 
 ## So What Were The Four Coffees?
 
-The four different coffees were each of a different roast: light, medium, and dark. The fourth coffee, [Coffee D]{.coffeed}, is a light roast coffee but with a unique processing method - anaerobic natural process - this tends to give the coffee a heavy fruity and fermented taste.
-
-To ensure every participant tasted nearly the exact same coffee profile, coffee pods were shipped flash frozen liquid of concentrated coffee, needing only to add hot water.
+The four different coffees, @tbl-fourcoffees, were each of a different roast: light, medium, and dark. The fourth coffee, [Coffee D]{.coffeed}, was a light roast coffee but with a unique processing method. The method was anaerobic natural fermentation, meaning that coffee cherries are kept in a closed container with no oxygen as to allow for fermentation of the raw coffee beans - this tends to give the coffee a heavy fruity and fermented taste.
 
 ```{r}
 #| label: tbl-fourcoffees
+#| tbl-cap: The Four Coffees Tasted
 coffee_types = data.frame(Coffee = c("Coffee A", "Coffee B", "Coffee C", "Coffee D"), "Roast Level" = c("Light", "Medium", "Dark", "Light"), Origin = c("Single - Kenya", "Multiple - Blend", "Multiple - Blend", "Single - Columbia"))
 coffee_types |> gt() |> gt_theme_538() |> gt_add_coffee_color("Coffee") |> cols_label("Roast.Level" = "Roast Level")
 ```
 
-Based on these four coffees, how do you think the tastes will compare? Which would you think are more bitter or more acidic?
+Based on these four coffees, how do you think the tastes will compare? Which would you think are more bitter or more acidic? Do you think you would have a favorite?
 
-## Demographics / Traits
+## Demographics
 
-Nearly 3 out of 4 (74%) participants were between ages 25 and 44 years compared to the worldwide YouTube audience where only 37% are between the ages of 25-44 [^1]. Participants are also overwhelming male representing 62% of participants verse U.S. YouTube demographics where 49% are male [^2].
-
-This suggests James' audience tend to be younger and male, minimizing the YouTube bias.. Perhaps because specialty coffee started to arise in the early 2000s.
+Nearly 3 out of 4 (74%) participants were between ages 25 and 44 years (@tbl-age_habit) which is much higher compared to the worldwide YouTube audience where only 37% are between these ages [^1]. Participants are also overwhelming male representing 62% of participants verse U.S. YouTube demographics where 49% are male [^2]. We can say James' audience tend to be younger and male, even accounting for YouTube bias.
 
 :::: {.columns}
-::: {.column width="50%"}
-I also looked at the breakdown of daily coffee drinking by age. Interestingly, we see a trend in drinking more cups of coffee per day as one ages. Who said college students drink lots of coffee, maybe we should say it's the retirees who drink far more?
+::: {.column width="45%"}
+I also looked at the breakdown of daily coffee drinking by age in @tbl-age_habit. Interestingly, we see a trend in drinking more coffee per day as one ages. Who said college students drink lots of coffee, maybe we should say it's the retirees who drink far more because of their spare time?
 :::
-::: {.column width="50%"}
+::: {.column width="55%"}
 
 ```{r}
 #| label: fig-gender
-#| fig-height: 2.5
+#| fig-height: 4
 #| fig-cap: Participants by Gender
-df |> count(gender_relabel) |> mutate(perc = n / sum(n)) |> ggplot(aes(reorder(gender_relabel, n), perc, fill = gender_relabel)) + geom_bar(stat = 'identity') + coord_flip() + theme_coffee() + geom_text(
+df |> count(gender_relabel) |> mutate(perc = n / sum(n)) |> ggplot(aes(reorder(gender_relabel, n), perc, fill = gender_relabel)) + geom_bar(stat = 'identity') + coord_flip() + theme_coffee(base_size = 16) + geom_text(
           aes(label = scales::percent(perc, accuracy = 1), color = gender_relabel),
           # color = "grey",
           fontface = "bold",
@@ -199,14 +173,13 @@ age_counts = df |>
 
 ```{r }
 #| label: tbl-age_habit
-#| tbl-cap: Participant Age and Daily Drinking Habits
+#| tbl-cap: Participant Age and Daily Coffee Drinking Habits
 left_join(age_counts, age_cups_per_day, by = join_by(what_is_your_age)) |> gt() |> gt_plt_bar_stack(list_data, labels = cup_groups, fmt_fn = scales::label_percent(accuracy = 1), width = 100) |> gt_theme_538() |> gt_plt_bar_pct(column = perc, scaled = TRUE, fill = "blue", labels = TRUE, decimals = 0, width = 100, font_size = "12px") |> gt::cols_label("what_is_your_age" = "Age Group", "perc" = "Age Group Prop") |>  gt::tab_footnote("100 participants were removed due to null response values.")
 ```
 
 ## Coffee Expertise
-
 Participants were asked to rate one's own coffee expertise on a scale of 1 - 10. Not surprisingly, we see participants lean towards the upper half with nearly half (45%) rating themselves as a 6 or 7. However, there is still a significant number on the lower end and very few at a 9 or 10, pulling the overall average down to 5.7.
-As to more easily compare these groups throughout my analysis, I binned one's level of expertise into five groups. Now, the '5-6' and '7-8' expertise groups make up about the same proportion (36% each) while the '9-10' expertise group make up only 3% of total participants.
+As to more easily compare these groups throughout my analysis, I binned one's level of expertise into five groups. Now, the '5-6' and '7-8' expertise groups make up about the same proportion (36% each) and the '9-10' expertise group make up only 3% of total participants.
 
 ```{r}
 #| label: fig-exp
@@ -229,17 +202,19 @@ df |> filter(!is.na(exp_group)) |> count(exp_group) |> mutate(perc = n / sum(n))
 
 :::: {.columns}
 ::: {.column width="50%"}
-Let's explore the coffee drinking habits by expertise group. @drink_exp shows a trend in increasing coffee consumption as one learns more about coffee. Some even drinking 4 or more cups per day with nearly 1 out of 10 for the '9-10' expertise group. Similar pattern with drinking coffee just black - meaning no milk, sugar, or other additive. @fig-favorite shows that pourover are more likely to be consumed by more 'advanced' expertise - a method to brew coffee that is usually drunk black. Interestingly, participants across all expertise groups consistently drink regular drip coffee- I suppose that method is still very convenient whether drinking at home, buying from a gas station, or at work. Admittedly, I'm confused how an 'expert' coffee drinker says their favorite coffee comes from a drip coffee as this method allows the least control over variables that make great coffee. 
+Let's explore the coffee drinking habits by expertise group. @fig-drink_exp shows a trend in increasing coffee consumption as one learns more about coffee. Some even drinking 4 or more cups per day with nearly 1 out of 10 participants for the '9-10' expertise group. There's a similar pattern with drinking coffee just black - meaning no milk, sugar, or other additive (like olive oil).
 :::
 ::: {.column width="50%"}
 ```{r}
 #| label: fig-drink_black
 #| fig-height: 4
-#| fig-cap: If Participants Drink Coffee Just Black by Expertise Group
+#| fig-cap: If Participants Drink Coffee 'Just Black' by Expertise Group
 df |> filter(!is.na(just_black), !is.na(exp_group)) |> count(just_black, exp_group) |> group_by(exp_group) |> mutate(perc = n / sum(n), just_black = factor(just_black, levels = c("Yes, just black", "No"))) |> gg_bars("exp_group", "perc", single_color = TRUE, base_size = 20, bar_color = "steelblue") + facet_grid(~just_black)
 ```
 :::
 ::::
+
+@fig-favorite shows that a pour over is up to 8x more likely to be consumed by those with more coffee expertise compared to those with little expertise. Pour over is my daily driver to brew coffee every morning. Interestingly, participants across all expertise groups consistently drink regular drip coffee- I suppose that method is still very quick and convenient whether drinking at home, buying from a gas station, or at work. Admittedly, I'm still confused how an 'expert' coffee drinker says their favorite coffee comes from a drip coffee as this method allows for the least control over variables that make great coffee. 
 
 ```{r}
 #| label: fig-drink_exp
@@ -259,11 +234,11 @@ df |> filter(fav_coffee != "", !is.na(exp_group)) |> count(fav_coffee, exp_group
 ### Spending Habits
 As one would expect, as one becomes more experienced in a hobby, one spends more money. That was very true for me as I fell into black hole of striving to perfect my coffee game, wanting to buy the top gear given my budget.
 
-For the folks with less expertise, nearly half (48%) of them spend less than \$20 a month. @fig-drink_exp shows that this group typically drinks less coffee with most (74%) drinking 0-1 cups per day. They also probably don't drink a lot of specialty coffee since a bag of beans costs \$10-20 nor drink coffee at specialty cafes too often.
+For the folks with less expertise, nearly half (48%) of them spend less than \$20 a month. @fig-drink_exp shows that this group typically drinks far less coffee with most (74%) drinking 0-1 cups per day. Given their low spending, they probably don't drink a lot of specialty coffee since a bag of beans costs \$10-20 nor drink coffee at specialty cafes too often.
 
-We find similar a pattern when asked how much a participant spent on coffee equipment over the past five years. While James says having a good coffee grinder makes for a better coffee, a decent one does cost for than $100. Again, this suggests folks with '1-2' coffee expertise most likely do not own one.
+We find similar a pattern in low spending when asked how much a participant spent on coffee equipment over the past five years. While James says having a good coffee grinder can greatly improve a cup of coffee, a quality one typically costs more than $100. This implies these folks probably make terrible coffee with a drip coffee maker, but who am I to judge?
 
-For the upper end - the '9-10' expertise group, most (94%) spend at least $20 a month and over half (58%) have spent over \$1,000 over the past 5 years on coffee equipment. Given that this group is much more likely to drink pour over - a method where one may own a goose neck electric kettle, coffee scale, Chemex, and a decent grinder which can easily add up to a few hundred dollars. And they are also more likely to drink espresso in which they may own a machine at home, a machine that can cost over \$1,000.
+For the upper end - the '9-10' expertise group, most (94%) spend at least $20 a month and over half (58%) have spent over \$1,000 over the past 5 years on coffee equipment. Given that this group is much more likely to drink pour over - a method where one may own a goose neck electric kettle, coffee scale, Chemex, and a decent grinder which can easily add up to a few hundred dollars. And they are also more likely to drink espresso (@fig-favorite) in which they may own an espresso machine at home, a machine that can easily cost over \$1,000.
 
 ```{r}
 #| label: fig-money_month
@@ -291,15 +266,21 @@ df |> filter(!is.na(exp_group), !is.na(spend_5_years)) |> count(spend_5_years, e
 
 Most of us have probably seen tasting notes when purchasing coffee (i.e. grapefruit, chocolate) and the roast level but are these descriptors actually helpful? Would someone describe similar notes of the same coffee?
 
-(pictures)(flavor wheel)
-![James Slurping One Coffee](assets/james_slurp.jpg){.centerimg height=250px}
-Participants tasted the coffee via coffee cupping, a coffee tasting technique. A taster takes a spoonful of coffee a slurps it as to asses aspects such as cleanness, sweetness, acidity, mouthfeel and aftertaste. Why slurp? Aerating the liquid as it makes contact with taste buds which intensifies the tasting sensation. Swishing it over the whole mouth coats all areas of the tongue, the front sweet, sides sour and back bitter. (reword)
+![James Slurping One Coffee](assets/james_slurp.png){.centerimg height=250px}
+Participants tasted the coffee via coffee cupping, a coffee tasting technique where a taster takes and spoonful of coffee a slurps it as to asses aspects such as cleanness, sweetness, acidity, mouthfeel and aftertaste as in the above picture. But why the slurp? Slurping aerates the coffee as it makes contact with taste buds which intensifies the tasting sensation. Swishing it over the whole mouth coats all areas of the tongue, the front sweet, sides sour and back bitter as to assess all aspects of taste.
 
 To find this out, I looked at how participants ranked the level of bitterness and acidity of each coffee. Then they were asked to write down tasting notes so I will explore this via a text analysis to identify the top **flavor notes** used to describe each coffee.
 
 ### Bitterness and Acidity
+Participants were asked to rate the level of **bitterness** and **acidity** of each coffee on a scale of 1-5. @tbl-bitterstats shows that a rank of 2, 3, 3, and 2 were the top choices for Coffees A-D, respectively. @tbl-bitterstats demonstrates that average bitterness of [Coffee A]{.coffeea} and [Coffee D]{.coffeed} were similar while [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} were also similar. TO find if these averages between these two pair of coffee are statistically significant, I performed a one-sided t-test.
+
+show that the average may be different (p = xx).
+
+We can statistically say the order of bitterness: Coffee A > ss > 
+Again, for acidity, we have similar patterns.
 
 ```{r bitterness}
+#| eval: false
 #| label: fig-bitter
 #| fig-height: 2.5
 #| fig-cap: "Coffee Bitterness Scores"
@@ -312,6 +293,7 @@ purrr::reduce(bitter_count, bind_rows) |> tidyr::pivot_longer(cols = "type") |> 
 ```
 
 ```{r acidity}
+#| eval: false
 #| label: fig-acid
 #| fig-height: 2.5
 #| fig-cap: Coffee Acidity Scores
@@ -324,19 +306,48 @@ purrr::reduce(acid_count, bind_rows) |> tidyr::pivot_longer(cols = "type") |> mu
 ```
 
 ```{r means}
+bitter_cols = c("coffee_a_bitterness", "coffee_b_bitterness", "coffee_c_bitterness", "coffee_d_bitterness")
+acid_cols = c("coffee_a_acidity", "coffee_b_acidity", "coffee_c_acidity", "coffee_d_acidity")
+
 mean_bitter = purrr::map(
-    c("coffee_a_bitterness", "coffee_b_bitterness", "coffee_c_bitterness", "coffee_d_bitterness"),
-    ~ summarize(df, "Mean Bitterness" = mean(.data[[.x]], na.rm =TRUE), "Standard Deviation" =sd(.data[[.x]], na.rm =TRUE)) |> mutate(Coffee = paste("Coffee",toupper(substr(.x, 8,8))))
+    bitter_cols,
+    ~ summarize(df, "Average Bitter" = mean(.data[[.x]], na.rm =TRUE), "Standard Deviation" =sd(.data[[.x]], na.rm =TRUE)) |> mutate(Coffee = paste("Coffee",toupper(substr(.x, 8,8))))
 ) |> bind_rows()
-
-bitter_table = mean_bitter |>  gt() |> gt_theme_538() |> gt_add_coffee_color("Coffee") |> gt::fmt_number() |> cols_move(c("Mean Bitterness", "Standard Deviation"), after = "Coffee")
-
 mean_acid = purrr::map(
-    c("coffee_a_acidity", "coffee_b_acidity", "coffee_c_acidity", "coffee_d_acidity"),
-    ~ summarize(df, "Mean Acidity" = mean(.data[[.x]], na.rm =TRUE), "Standard Deviation" =sd(.data[[.x]], na.rm =TRUE)) |> mutate(Coffee = paste("Coffee",toupper(substr(.x, 8,8))))
+    acid_cols,
+    ~ summarize(df, "Average Acidity" = mean(.data[[.x]], na.rm =TRUE), "Standard Deviation" =sd(.data[[.x]], na.rm =TRUE)) |> mutate(Coffee = paste("Coffee",toupper(substr(.x, 8,8))))
 ) |> bind_rows()
 
-acid_table = mean_acid |>  gt() |> gt_theme_538() |> gt_add_coffee_color("Coffee") |> gt::fmt_number() |> cols_move(c("Mean Acidity", "Standard Deviation"), after = "Coffee")
+bitter_dist=purrr::map(
+    bitter_cols,
+    ~ filter(df, !is.na(.data[[.x]])) |> reframe(list_data = list(.data[[.x]]))|> mutate(Coffee = paste("Coffee",toupper(substr(.x, 8,8))))
+) |> bind_rows()
+acid_dist=purrr::map(
+    acid_cols,
+    ~ filter(df, !is.na(.data[[.x]])) |> reframe(list_data = list(.data[[.x]]))|> mutate(Coffee = paste("Coffee",toupper(substr(.x, 8,8))))
+) |> bind_rows()
+
+acid_table =
+  left_join(mean_acid, acid_dist, by = "Coffee") |> gt() |> gt_theme_538() |> gt_add_coffee_color("Coffee") |> gt::fmt_number() |> cols_move(c("Average Acidity", "Standard Deviation"), after = "Coffee") |> gtExtras::gt_plt_dist(
+    list_data,
+    type = "histogram",
+    line_color = "white",
+    fill_color = "steelblue",
+    bw = 1,
+    same_limit = TRUE,
+    fig_dim = c(6, 30)
+  ) |> cols_label("list_data" = "Distribution of Rank (1-5)")
+
+bitter_table =
+  left_join(mean_bitter, bitter_dist, by = "Coffee") |> gt() |> gt_theme_538() |> gt_add_coffee_color("Coffee") |> gt::fmt_number() |> cols_move(c("Average Bitterness", "Standard Deviation"), after = "Coffee") |> gtExtras::gt_plt_dist(
+    list_data,
+    type = "histogram",
+    line_color = "white",
+    fill_color = "steelblue",
+    bw = 1,
+    same_limit = TRUE,
+    fig_dim = c(6, 30)
+  ) |> cols_label("list_data" = "Distribution of Rank (1-5)")
 # bitter_table
 # acid_table
 # gtExtras::gt_two_column_layout(list(bitter_table, acid_table))
@@ -375,45 +386,51 @@ bc_acid_test = t.test(df[, coffee_c_acidity], df[, coffee_b_acidity], "greater")
 purrr::map_df(list(bc_ttest, ad_ttest, ad_acid_test, bc_acid_test), broom::tidy) |> select(statistic, p.value) |> gt() |> fmt_number(decimals = 4)
 ```
 
-To start, participants were asked to rate the level of bitterness and acidity of each coffee from a scale of 1-5. Average bitterness, @tbl-bitterstats, among the four coffees show that [Coffee A]{.coffeea} and [Coffee D]{.coffeed} were similar while [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} were also similar. But are these averages between these two pair of coffee statistically significant. To find this out, I performed a one-sided t-test. show that the average may be different (p = xx).
+### Taste Notes
 
-We can statistically say the order of bitterness: Coffee A > ss > 
-Again, for acidity, we have similar patterns.
+Cool we found a correlation in bitterness and acidity in the coffees! Let's dig deeper into what the coffee tasted like, as described by the participants. So ***What does the coffee remind you of?*** was a repeated question James asked to describe the flavor notes during the live stream. Coffee tastes like coffee, but there are nuances in the flavor notes that have a similar mouthfeel as other foods.
 
-### Flavor Notes
+Comparing coffees side-by-side allows one to discover the nuances of each coffee. One may start with a general words such as 'nutty' but then move on to identify which nut. Below is a coffee flavor wheel, a tool to help identify words for one's taste buds (note this was NOT used during the live event).
 
-Cool we found a pattern in bitterness and acidity in the coffees! Let's dig deeper into what the coffee tasted like. So ***What does the coffee remind you of?*** was a repeated question James asked to describe the flavor notes.
+```{r}
+#| fig-cap: Coffee Flavor Wheel (Hover to read descriptions)
+cup_notes <-
+  cup_notes |> mutate(new_label = paste0(
+    "<b>",
+    end_name,
+    ": ",
+    "</b>",
+    ifelse(is.na(labels), "", stringr::str_wrap(labels, width = 30))
+  ))
+left_join(cup_notes, y = match_colors, by = c("end_name" = "ids")) |>
+  coffee_sunburst(mcolor = ~ color2, hover = ~ new_label)
+```
 
-Comparing coffees side-by-side allows one to discover the nuances of each coffee. One may start with a general words such as 'nutty' but then move on to identify which nut. Below is a flavor wheel, a tool to help identify words for one's taste buds (note this was NOT used during the live event).
-
-(wheel)
-
-Participants were asked to describe the coffee flavors in an open text field. After some cleaning of these words, I performed a text analysis by identifying and counting key flavor words, such as 'bright' or 'grapefruit.' I took the **top 25 most frequent words** and made a **word cloud.** The larger the word, the frequent the word was mentioned (note-the count is in the hover text).
-
-[Coffee A]{.coffeea} conjures up images of something light and fruity. While [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} using 'chocolate' and 'nutty' as common descriptors and a few even described it as burnt. [Coffee C]{.coffeec} has more of a spread in word counts.
-B and C
-
-[Coffee D]{.coffeed}, however, paints a different image. 'Fermented' and 'funky' made it to the top - given this was a natural processed coffee this is not surprising!
+Participants were asked to describe the coffee flavors in an open text field. After some cleaning of these words, I performed a text analysis by identifying and counting key flavor words, such as 'bright' or 'grapefruit.' I took the **top 25 most frequent words** of each coffee and put them in a **word cloud.** The larger the word, the frequent the word was mentioned (note: the count of each word is in the hover text).
 
 <div id="parent">
 <div id="child-left">
-<p class="wc_cap">[Coffee A]{.coffeea}: Fruity: 616 Respondents</p>
+<p class="wc_cap">[Coffee A]{.coffeea}: Top Word was **Fruity** with 616 Respondents</p>
 <iframe src = "/assets/widgets/a.html" width = "100%" height = "200"></iframe></div>
 <div id="child-right">
-<p class="wc_cap">[Coffee B]{.coffeeb}: Chocolate: 600 Respondents</p>
+<p class="wc_cap">[Coffee B]{.coffeeb}: Top Word was **Chocolate** with 600 Respondents</p>
 <iframe src = "/assets/widgets/b.html" width = "100%" height = "200"></iframe></div>
 </div>
 
 <div id="parent">
 <div id="child-left">
-<p class="wc_cap">[Coffee C]{.coffeec}: Chocolate: 332 Respondents</p>
+<p class="wc_cap">[Coffee C]{.coffeec}: Top Word was **Chocolate** with 332 Respondents</p>
 <iframe src = "/assets/widgets/c.html" width = "100%" height = "200"></iframe></div>
 <div id="child-right">
-<p class="wc_cap">[Coffee D]{.coffeed}: Fruity: 1,085 Respondents</p>
+<p class="wc_cap">[Coffee D]{.coffeed}: Top Word was **Fruity** with 1,085 Respondents</p>
 <iframe src = "/assets/widgets/d.html" width = "100%" height = "200"></iframe></div>
 </div>
 
-Okay - so let's see how these tasting notes match up on the flavor wheel. ['Acid', 'Bitter', 'Sweet', 'Fruity',]{.coffeeother} and ['Chocolate']{.coffeeother} are generic words used to describe all 4 coffees. However, they were used at different frequencies as demonstrated in the word clouds. Looking at the yellow sectors, we do see a pattern for [Coffee A]{.coffeea} and [Coffee D]{.coffeed} compared to [Coffee B]{.coffeeb} and [Coffee C]{.coffeec}. 
+[Coffee A]{.coffeea} conjures up images of something *light*, *bright* and *fruity.* While participants described [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} as *chocolate*, *nutty*, and *balanced* while a few even described it as *burnt*. [Coffee C]{.coffeec} had more of a spread in word counts as words are similar in size. [Coffee D]{.coffeed}, however, paints a much different image. *Fermented* and *funky* made it to the top - given this was a fermented natural processed coffee, this is not surprising!
+
+B and C
+
+Okay - so let's see how these tasting notes match up on the flavor wheel below. ['Acid', 'Bitter', 'Sweet', 'Fruity',]{.coffeeother} and ['Chocolate']{.coffeeother} are generic words used to describe all 4 coffees, though at different frequencies as demonstrated in the word clouds. Looking at the yellow sectors, we do see a pattern for [Coffee A]{.coffeea} and [Coffee D]{.coffeed} compared to [Coffee B]{.coffeeb} and [Coffee C]{.coffeec}.
 
 ```{r text analysis}
 coffee_a_words = count_cupping_notes(df$coffee_a_notes, count_min = 20)
@@ -425,7 +442,7 @@ coffee_d_words = count_cupping_notes(df$coffee_d_notes, count_min = 20)
 
 ```{r}
 #| label: fig-tastenotes
-#| fig-cap: "Overlapping Taste Notes"
+#| fig-cap: "The Colors Represent Which Taste Notes Overlap Which Coffee"
 all_top = purrr::reduce(
   list(
     coffee_a_words[1:25] |> prepare_words(color = "#ff3d19") |> mutate(coffee = "A"),
@@ -444,14 +461,8 @@ all_top |> coffee_words_join(cup_notes, color = "#e5e5e5") |>
   coffee_sunburst(mcolor = ~color2, hover = ~match_coffee)
 ```
 
-## Which Was the Best?
-None.
+### Taste Preferences
 
-[^1]: https://datareportal.com/essential-youtube-stats
-[^2]: https://www.statista.com/statistics/810461/us-youtube-reach-gender/
-
-## Conclusion
-This cupping live stream demonstrates there's actually some commonalities between tasting by the cupping participants.
 ```{r}
 #| label: fig-fav_exp
 #| fig-height: 2.5
@@ -461,9 +472,37 @@ df |> count(exp_group, lastly_what_was_your_favorite_overall_coffee) |>
   reframe(perc = n/sum(n),lastly_what_was_your_favorite_overall_coffee, .by = exp_group)  |>
   gg_bars( "exp_group", "perc", "lastly_what_was_your_favorite_overall_coffee") + facet_grid(~lastly_what_was_your_favorite_overall_coffee) + scale_color_manual(values = coffee_pal) + scale_fill_manual(values = coffee_pal)
 ```
-
+Out of 
+Coffee D is also ones who love pour overs, not lattes. Generically more for lighter roasts. Seems like Coffee C is the loser - the most bitter (maybe that's just my bias)
+As we've previously seen, *chocolate* was describe in Coffee B and Coffee C so it's not surprising to see their favorite coffee was either of these two. We also see a correlation between those groups who liked fruity and those favorite was Coffee D. 
 ```{r}
-#| label: fig
-#| eval: false
-# df |> filter(exp_group != "") |>  count(before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like, exp_group) |> group_by(exp_group) |> mutate(perc = n / sum(n)) |> ggplot(aes(before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like, perc)) + geom_col() + facet_grid(rows = vars(exp_group)) + theme_coffee(8)
+#| label: tbl-heatmap
+#| tbl-cap: Heatmap of Coffee Preferences Before Tasting by Expertise Group
+fav_flavr_exp = df |> filter(
+  exp_group != "",
+  before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like !=
+    ""
+) |>  count(
+  before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like,
+  exp_group
+) |> group_by(exp_group) |> mutate(perc = n / sum(n))
+
+fav_flavr_exp |> select(-n) |> tidyr::pivot_wider(names_from = exp_group, values_from = perc) |> rename("Flavor" = before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like) |> gt() |> data_color(
+  columns = c(2:6),
+  palette = c("white", "#b07112"),
+  direction = c("column", "row")
+) |> fmt_percent(decimals = 0)
+
+#  df |> filter(
+#   exp_group != "",
+#   what_roast_level_of_coffee_do_you_prefer != "") |>  count(
+#   what_roast_level_of_coffee_do_you_prefer,
+#   exp_group
+# ) |> group_by(exp_group) |> mutate(perc = n / sum(n)) |> ggplot(aes(exp_group, perc)) + geom_col() + facet_grid(cols = vars(what_roast_level_of_coffee_do_you_prefer)) + theme_coffee(8)
 ```
+
+[^1]: https://datareportal.com/essential-youtube-stats
+[^2]: https://www.statista.com/statistics/810461/us-youtube-reach-gender/
+
+## Conclusion
+This cupping live stream demonstrates there's actually some commonalities between tasting by the cupping participants. Coffee A and Coffee D were both fruity, while Coffee D was described as 'fermented'. Coffee B and Coffee C also had similar flavor notes, which Coffee C was statistically described as being more bitter, on average. This also demonstrated there's not much flavor differences in medium and dark roasts as compared to light roast coffees.

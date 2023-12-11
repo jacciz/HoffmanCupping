@@ -1,4 +1,4 @@
-/* css styles DID ADJUST p*/
+/* css styles DID ADJUST p and hs*/
 #parent{
     padding: 0;
 }
@@ -20,6 +20,9 @@ figcaption, .panel-caption, .figure-caption, .subfigure-caption, .table-caption,
 
 .wc_cap{
   font-style: italic;
+  color:#2373b0 ;
+  font-size: .9rem;
+  text-align: left;
 }
 
 .coffeea{
@@ -68,6 +71,7 @@ p, .p {
 
 h2, .h2{
   font-size: calc(1.1rem + 0.48vw);
+  color: #b07112;
 }
 h3, .h3 {
   color: #2373b0;
