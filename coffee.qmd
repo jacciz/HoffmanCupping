@@ -225,11 +225,11 @@ df |> filter(!is.na(exp_group)) |> count(exp_group) |> mutate(perc = n / sum(n))
 
 ## Coffee Habits
 
-### Coffee Drinking Habits
+### Coffee Consumption
 
 :::: {.columns}
 ::: {.column width="50%"}
-Let's explore the coffee drinking habits by expertise group.
+Let's explore the coffee drinking habits by expertise group. @drink_exp shows a trend in increasing coffee consumption as one learns more about coffee. Some even drinking 4 or more cups per day with nearly 1 out of 10 for the '9-10' expertise group. Similar pattern with drinking coffee just black - meaning no milk, sugar, or other additive. @fig-favorite shows that pourover are more likely to be consumed by more 'advanced' expertise - a method to brew coffee that is usually drunk black. Interestingly, participants across all expertise groups consistently drink regular drip coffee- I suppose that method is still very convenient whether drinking at home, buying from a gas station, or at work. Admittedly, I'm confused how an 'expert' coffee drinker says their favorite coffee comes from a drip coffee as this method allows the least control over variables that make great coffee. 
 :::
 ::: {.column width="50%"}
 ```{r}
@@ -259,12 +259,11 @@ df |> filter(fav_coffee != "", !is.na(exp_group)) |> count(fav_coffee, exp_group
 ### Spending Habits
 As one would expect, as one becomes more experienced in a hobby, one spends more money. That was very true for me as I fell into black hole of striving to perfect my coffee game, wanting to buy the top gear given my budget.
 
-For the folks with less expertise, nearly half (48%) of them spend less than \$20 a month. @fig-drink_exp showed that this group does drink less coffee. They also probably don't drink a lot of specialty coffee since a bag costs \$10-20 a bag nor drink coffee at specialty cafes.
+For the folks with less expertise, nearly half (48%) of them spend less than \$20 a month. @fig-drink_exp shows that this group typically drinks less coffee with most (74%) drinking 0-1 cups per day. They also probably don't drink a lot of specialty coffee since a bag of beans costs \$10-20 nor drink coffee at specialty cafes too often.
 
 We find similar a pattern when asked how much a participant spent on coffee equipment over the past five years. While James says having a good coffee grinder makes for a better coffee, a decent one does cost for than $100. Again, this suggests folks with '1-2' coffee expertise most likely do not own one.
 
-I wonder if this group has a coffee preference, one akin to Folger's
-
+For the upper end - the '9-10' expertise group, most (94%) spend at least $20 a month and over half (58%) have spent over \$1,000 over the past 5 years on coffee equipment. Given that this group is much more likely to drink pour over - a method where one may own a goose neck electric kettle, coffee scale, Chemex, and a decent grinder which can easily add up to a few hundred dollars. And they are also more likely to drink espresso in which they may own a machine at home, a machine that can cost over \$1,000.
 
 ```{r}
 #| label: fig-money_month
@@ -290,9 +289,13 @@ df |> filter(!is.na(exp_group), !is.na(spend_5_years)) |> count(spend_5_years, e
 
 ### What is Coffee Cupping?
 
-Most of us have probably seen tasting notes when purchasing coffee (i.e. grapefruit, chocolate) but are these actually descriptive? Would someone describe similar notes of the same coffee? Is there a relationship between tasting notes and roast levels? To find this out, I looked at how participants ranked the level of bitterness and acidity of each coffee. Then they were asked to describe their tasting notes so I will explore this via a text analysis.
+Most of us have probably seen tasting notes when purchasing coffee (i.e. grapefruit, chocolate) and the roast level but are these descriptors actually helpful? Would someone describe similar notes of the same coffee?
 
 (pictures)(flavor wheel)
+![James Slurping One Coffee](assets/james_slurp.jpg){.centerimg height=250px}
+Participants tasted the coffee via coffee cupping, a coffee tasting technique. A taster takes a spoonful of coffee a slurps it as to asses aspects such as cleanness, sweetness, acidity, mouthfeel and aftertaste. Why slurp? Aerating the liquid as it makes contact with taste buds which intensifies the tasting sensation. Swishing it over the whole mouth coats all areas of the tongue, the front sweet, sides sour and back bitter. (reword)
+
+To find this out, I looked at how participants ranked the level of bitterness and acidity of each coffee. Then they were asked to write down tasting notes so I will explore this via a text analysis to identify the top **flavor notes** used to describe each coffee.
 
 ### Bitterness and Acidity
 
@@ -372,20 +375,23 @@ bc_acid_test = t.test(df[, coffee_c_acidity], df[, coffee_b_acidity], "greater")
 purrr::map_df(list(bc_ttest, ad_ttest, ad_acid_test, bc_acid_test), broom::tidy) |> select(statistic, p.value) |> gt() |> fmt_number(decimals = 4)
 ```
 
-To start, participants were asked to rate the level of bitterness and acidity of each coffee from a scale of 1 -5. Average bitterness among the four coffees show that [Coffee A]{.coffeea} and [Coffee D]{.coffeed} were similar while [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} were also similar. But are these averages between these two pair of coffee statistically significant. To find this out, I performed a one-sided t-test. show that the average may be different (p = xx).
+To start, participants were asked to rate the level of bitterness and acidity of each coffee from a scale of 1-5. Average bitterness, @tbl-bitterstats, among the four coffees show that [Coffee A]{.coffeea} and [Coffee D]{.coffeed} were similar while [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} were also similar. But are these averages between these two pair of coffee statistically significant. To find this out, I performed a one-sided t-test. show that the average may be different (p = xx).
 
+We can statistically say the order of bitterness: Coffee A > ss > 
 Again, for acidity, we have similar patterns.
 
 ### Flavor Notes
 
-Cool we found a difference in bitterness and acidity in the coffees! So ***What does the coffee remind you of?*** was a repeated question James asked to describe the flavor notes. Comparing coffees side-by-side allows one to discover the nuances of each coffee. One may start with a general words such as 'nutty.' Below is a flavor wheel, a tool to help identify words for one's taste buds.
+Cool we found a pattern in bitterness and acidity in the coffees! Let's dig deeper into what the coffee tasted like. So ***What does the coffee remind you of?*** was a repeated question James asked to describe the flavor notes.
+
+Comparing coffees side-by-side allows one to discover the nuances of each coffee. One may start with a general words such as 'nutty' but then move on to identify which nut. Below is a flavor wheel, a tool to help identify words for one's taste buds (note this was NOT used during the live event).
 
 (wheel)
-This cupping live stream demonstrates there's actually some commonalities between tasting by the cupping participants.
 
-Participants were asked to describe the coffee flavors in an open text field. I did a text analysis by identifying and counting key flavor words, such as 'bright' or 'grapefruit.' I took the **top 25 most frequent words** and made a **word cloud.** The larger the word, the frequent the word was mentioned (note-the count is in the hover text).
+Participants were asked to describe the coffee flavors in an open text field. After some cleaning of these words, I performed a text analysis by identifying and counting key flavor words, such as 'bright' or 'grapefruit.' I took the **top 25 most frequent words** and made a **word cloud.** The larger the word, the frequent the word was mentioned (note-the count is in the hover text).
 
 [Coffee A]{.coffeea} conjures up images of something light and fruity. While [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} using 'chocolate' and 'nutty' as common descriptors and a few even described it as burnt. [Coffee C]{.coffeec} has more of a spread in word counts.
+B and C
 
 [Coffee D]{.coffeed}, however, paints a different image. 'Fermented' and 'funky' made it to the top - given this was a natural processed coffee this is not surprising!
 
@@ -444,6 +450,8 @@ None.
 [^1]: https://datareportal.com/essential-youtube-stats
 [^2]: https://www.statista.com/statistics/810461/us-youtube-reach-gender/
 
+## Conclusion
+This cupping live stream demonstrates there's actually some commonalities between tasting by the cupping participants.
 ```{r}
 #| label: fig-fav_exp
 #| fig-height: 2.5

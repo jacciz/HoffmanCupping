@@ -8,5 +8,6 @@
 .quarto
 _site
 _freeze
+coffee_files
 *.html
 /.quarto/
