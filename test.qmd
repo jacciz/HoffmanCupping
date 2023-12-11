@@ -11,28 +11,51 @@ execute:
 
 ```{r}
 library(gt)
-library(gtExtras)
+# library(gtExtras)
 library(dplyr)
-library(ggplot2)
-library(data.table)
-source("coffee_functions.R")
-source("theme_functions.R")
-df = read.csv("data/GACTT_RESULTS_ANONYMIZED_v2.csv") |> janitor::clean_names()
-setDT(df)
+# library(ggplot2)
+# library(data.table)
+# source("coffee_functions.R")
+# source("theme_functions.R")
+# df = read.csv("data/GACTT_RESULTS_ANONYMIZED_v2.csv") |> janitor::clean_names()
+# setDT(df)
 ```
 
 ```{r}
-#| fig-cap: caption
-#| fig-subcap: subcap
-x = mtcars |>head() |> select(1:5)  |> gt()
-gtExtras::gt_two_column_layout(list(x, x))
+x = mtcars |>head() |> select(1:5)  |> gt() 
+# gtExtras::gt_two_column_layout(list(x, x))
 ```
+Before cols
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r}
+as_raw_html(x)
+```
+
+:::
+::: {.column width="50%"}
+```{r}
+as_raw_html(x)
+```
+:::
+::::
+
+Text goes here!
+
 
 ```{r}
-#| fig-cap: caption2
-#| fig-subcap: subcap2
-mtcars |>head()  |> gt()
-```
+#| eval: false
+  cup_notes <-
+    cup_notes |> mutate(new_label = paste0(
+      "<b>",
+      end_name,
+      ": ",
+      "</b>",
+      ifelse(is.na(labels), "", stringr::str_wrap(labels, width = 30))
+    ))
 
-Tezt
+coffee_a_words[1:25] |> prepare_words(color = "#ff3d19") |> coffee_words_join(cup_notes, color = "#e5e5e5") |> coffee_sunburst()
+coffee_b_words[1:25] |> prepare_words(color = "#ff3d19") |> coffee_words_join(cup_notes, color = "#e5e5e5") |> coffee_sunburst()
+```
 

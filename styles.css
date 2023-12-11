@@ -11,6 +11,17 @@
     width: 50%;
 }
 
+figcaption, .panel-caption, .figure-caption, .subfigure-caption, .table-caption, figcaption.quarto-float-caption, caption{
+  color:#2373b0 ;
+  font-size: .9rem;
+  text-align: left;
+  font-style: italic;
+}
+
+.wc_cap{
+  font-style: italic;
+}
+
 .coffeea{
   color: #E41A1C;
   font-weight: 600;
@@ -29,6 +40,10 @@
   color: #984EA3;
   font-weight: 600;
 }
+.coffeeother{
+  color: #808080;
+  font-weight: 600;
+}
 
 .centerimg {
   display: block;
@@ -40,9 +55,7 @@ body {
   font-family: Arial;
 }
 
-figcaption{
-  font-style: italic;
-}
+
 
 p, .p {
   text-align: left;

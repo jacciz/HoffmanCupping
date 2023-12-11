@@ -7,7 +7,7 @@ format:
 execute: 
   echo: false
   warning: false
-fig-cap-location: top
+fig-cap-location: bottom
 tbl-cap-location: top
 editor: 
   markdown: 
@@ -110,8 +110,26 @@ df = df |> mutate_at(
     "$500-$1000" = "$100-$1000"
   ),
   spend_each_month = factor(spend_each_month , levels = money_month),
-  spend_5_years = factor(spend_5_years, levels = money_5_years)
+  spend_5_years = factor(spend_5_years, levels = money_5_years),
+  just_black = case_when(
+    do_you_usually_add_anything_to_your_coffee_no_just_black == TRUE ~ "Yes, just black",
+    do_you_usually_add_anything_to_your_coffee_no_just_black == FALSE ~ "No",
+    TRUE ~ NA
+  ),
+  fav_coffee = recode(
+    what_is_your_favorite_coffee_drink,
+    "Blended drink (e.g. Frappuccino)" = "Other",
+    "Cold brew" = "Cold brew/iced coffee",
+    "Iced coffee" = "Cold brew/iced coffee",
+    "Cortado" = "Other",
+    "Cappuccino" = "Other",
+    "Mocha" = "Other"
+  ),
+  gender_relabel = recode(gender,
+   "Other (please specify)" = "Unknown",
+    "Prefer not to say" = "Unknown")
 )
+
 ```
 
 The "Great America Taste Test" is what coffee expert and British **YouTuber James
@@ -129,6 +147,7 @@ The four different coffees were each of a different roast: light, medium, and da
 To ensure every participant tasted nearly the exact same coffee profile, coffee pods were shipped flash frozen liquid of concentrated coffee, needing only to add hot water.
 
 ```{r}
+#| label: tbl-fourcoffees
 coffee_types = data.frame(Coffee = c("Coffee A", "Coffee B", "Coffee C", "Coffee D"), "Roast Level" = c("Light", "Medium", "Dark", "Light"), Origin = c("Single - Kenya", "Multiple - Blend", "Multiple - Blend", "Single - Columbia"))
 coffee_types |> gt() |> gt_theme_538() |> gt_add_coffee_color("Coffee") |> cols_label("Roast.Level" = "Roast Level")
 ```
@@ -141,14 +160,19 @@ Nearly 3 out of 4 (74%) participants were between ages 25 and 44 years compared 
 
 This suggests James' audience tend to be younger and male, minimizing the YouTube bias.. Perhaps because specialty coffee started to arise in the early 2000s.
 
+:::: {.columns}
+::: {.column width="50%"}
 I also looked at the breakdown of daily coffee drinking by age. Interestingly, we see a trend in drinking more cups of coffee per day as one ages. Who said college students drink lots of coffee, maybe we should say it's the retirees who drink far more?
+:::
+::: {.column width="50%"}
 
 ```{r}
-#| fig-height: 3
+#| label: fig-gender
+#| fig-height: 2.5
 #| fig-cap: Participants by Gender
-df |> count(gender) |> mutate(perc = n / sum(n)) |> ggplot(aes(reorder(gender, n), perc)) + geom_bar(stat = 'identity', fill = "steelblue") + coord_flip() + theme_coffee() + geom_text(
-          aes(label = scales::percent(perc, accuracy = 1)),
-          color = "steelblue",
+df |> count(gender_relabel) |> mutate(perc = n / sum(n)) |> ggplot(aes(reorder(gender_relabel, n), perc, fill = gender_relabel)) + geom_bar(stat = 'identity') + coord_flip() + theme_coffee() + geom_text(
+          aes(label = scales::percent(perc, accuracy = 1), color = gender_relabel),
+          # color = "grey",
           fontface = "bold",
           hjust = -0.4
         ) + 
@@ -156,7 +180,7 @@ df |> count(gender) |> mutate(perc = n / sum(n)) |> ggplot(aes(reorder(gender, n
           expand = c(0, 0),
           limits = c(0, .68),
           labels = scales::percent
-        ) + theme(panel.grid.major.y = element_blank())
+        ) + theme(panel.grid.major.y = element_blank()) + scale_fill_manual(values = c( "Male"="steelblue")) + scale_color_manual(values = c( "Male"="steelblue"))
 
 age_cups_per_day = df |> 
   filter(!is.na(what_is_your_age), !is.na(total_cups)) |> 
@@ -170,20 +194,25 @@ age_counts = df |>
   filter(what_is_your_age != "Unknown", !is.na(total_cups)) |> 
   count(what_is_your_age) |> mutate(perc = n * 100 / sum(n), what_is_your_age = factor(what_is_your_age, age_groups))
 ```
+:::
+::::
 
 ```{r }
+#| label: tbl-age_habit
 #| tbl-cap: Participant Age and Daily Drinking Habits
 left_join(age_counts, age_cups_per_day, by = join_by(what_is_your_age)) |> gt() |> gt_plt_bar_stack(list_data, labels = cup_groups, fmt_fn = scales::label_percent(accuracy = 1), width = 100) |> gt_theme_538() |> gt_plt_bar_pct(column = perc, scaled = TRUE, fill = "blue", labels = TRUE, decimals = 0, width = 100, font_size = "12px") |> gt::cols_label("what_is_your_age" = "Age Group", "perc" = "Age Group Prop") |>  gt::tab_footnote("100 participants were removed due to null response values.")
 ```
 
 ## Coffee Expertise
+
 Participants were asked to rate one's own coffee expertise on a scale of 1 - 10. Not surprisingly, we see participants lean towards the upper half with nearly half (45%) rating themselves as a 6 or 7. However, there is still a significant number on the lower end and very few at a 9 or 10, pulling the overall average down to 5.7.
 As to more easily compare these groups throughout my analysis, I binned one's level of expertise into five groups. Now, the '5-6' and '7-8' expertise groups make up about the same proportion (36% each) while the '9-10' expertise group make up only 3% of total participants.
 
 ```{r}
+#| label: fig-exp
 #| layout-ncol: 2
 #| fig-height: 4
-#| fig-subcap:
+#| fig-cap:
 #|   - Self-Rated Coffee Expertise
 #|   - Binned Self-Rated Coffee Expertise Groups
 # Get mean expertise rank and % with 6 or 7
@@ -196,25 +225,49 @@ df |> filter(!is.na(exp_group)) |> count(exp_group) |> mutate(perc = n / sum(n))
 
 ## Coffee Habits
 
-### Drinkking Habits
+### Coffee Drinking Habits
+
+:::: {.columns}
+::: {.column width="50%"}
+Let's explore the coffee drinking habits by expertise group.
+:::
+::: {.column width="50%"}
+```{r}
+#| label: fig-drink_black
+#| fig-height: 4
+#| fig-cap: If Participants Drink Coffee Just Black by Expertise Group
+df |> filter(!is.na(just_black), !is.na(exp_group)) |> count(just_black, exp_group) |> group_by(exp_group) |> mutate(perc = n / sum(n), just_black = factor(just_black, levels = c("Yes, just black", "No"))) |> gg_bars("exp_group", "perc", single_color = TRUE, base_size = 20, bar_color = "steelblue") + facet_grid(~just_black)
+```
+:::
+::::
+
+```{r}
+#| label: fig-drink_exp
+#| fig-height: 2.5
+#| fig-cap: Daily Coffee Drinks by Expertise Group
+df |>  filter(!is.na(total_cups), !is.na(exp_group)) |> count(total_cups, exp_group) |> group_by(exp_group) |> mutate(perc = n / sum(n)) |> gg_bars( "exp_group", "perc", single_color = TRUE, bar_color = "steelblue") + facet_grid(~total_cups)
+```
+
+```{r}
+#| label: fig-favorite
+#| fig-height: 4.5
+#| fig-cap: Favorite Coffee Drink of Participants
+# Other includes into 'Other', 'Blended drink (e.g. Frappuccino)', 'Cortado', 'Cappuccino', 'Mocha'
+df |> filter(fav_coffee != "", !is.na(exp_group)) |> count(fav_coffee, exp_group) |> group_by(exp_group) |> mutate(perc = n / sum(n)) |> gg_bars("exp_group", "perc", single_color = TRUE, bar_color = "steelblue") + facet_wrap(~fav_coffee, ncol = 4) + labs(caption = "Other includes: 'Other', 'Blended drink (e.g. Frappuccino)', 'Cappuccino', 'Cortado', 'Mocha'")
+```
 
 ### Spending Habits
-As one would expect, as one becomes more experiences, one spends more money in a hobby. That was very true for me as I fell into black hole of striving to perfect my coffee game, wanting to buy the top gear given my budget.
+As one would expect, as one becomes more experienced in a hobby, one spends more money. That was very true for me as I fell into black hole of striving to perfect my coffee game, wanting to buy the top gear given my budget.
 
-For the folks with less expertise, nearly half (48%) of them spend less than \$20 a month. This suggests this group probably doesn't drink a lot of specialty coffee since a bag costs \$10-20 a bag nor drinks coffee at specialty cafes.
+For the folks with less expertise, nearly half (48%) of them spend less than \$20 a month. @fig-drink_exp showed that this group does drink less coffee. They also probably don't drink a lot of specialty coffee since a bag costs \$10-20 a bag nor drink coffee at specialty cafes.
 
 We find similar a pattern when asked how much a participant spent on coffee equipment over the past five years. While James says having a good coffee grinder makes for a better coffee, a decent one does cost for than $100. Again, this suggests folks with '1-2' coffee expertise most likely do not own one.
 
 I wonder if this group has a coffee preference, one akin to Folger's
 
-```{r}
-df |>  filter(!is.na(total_cups), !is.na(exp_group)) |> count(total_cups, exp_group) |> group_by(exp_group) |> mutate(perc = n / sum(n)) |> gg_bars( "exp_group", "perc", single_color = TRUE, bar_color = "steelblue") + facet_grid(~total_cups)
 
-df |> filter(what_is_your_favorite_coffee_drink != "", !is.na(exp_group)) |> count(what_is_your_favorite_coffee_drink, exp_group) |> group_by(exp_group) |> mutate(perc = n / sum(n)) |> gg_bars("exp_group", "perc", single_color = TRUE, bar_color = "steelblue") + facet_wrap(~what_is_your_favorite_coffee_drink, ncol = 6)
-
-df |> filter(!is.na(do_you_usually_add_anything_to_your_coffee_no_just_black), !is.na(exp_group)) |> count(do_you_usually_add_anything_to_your_coffee_no_just_black, exp_group) |> group_by(exp_group) |> mutate(perc = n / sum(n)) |> gg_bars("exp_group", "perc", single_color = TRUE, bar_color = "steelblue") + facet_grid(~do_you_usually_add_anything_to_your_coffee_no_just_black)
-```
 ```{r}
+#| label: fig-money_month
 #| fig-height: 2.5
 #| fig-cap: Money Spent Each Month on Coffee by Coffee Expertise
 # More expertise = more money spent, but not for the 10 expertise. Age with expertise??
@@ -223,6 +276,7 @@ df |> filter(!is.na(exp_group), !is.na(spend_each_month)) |> count(spend_each_mo
 ```
 
 ```{r}
+#| label: fig-money_5
 #| fig-height: 2.5
 #| fig-cap: Money Spent Over the Past 5 Years on Coffee Equipment by Coffee Expertise
 # nearly all do pourover or perhaps they work in industry, do spend a lot in the past 5 years
@@ -243,6 +297,7 @@ Most of us have probably seen tasting notes when purchasing coffee (i.e. grapefr
 ### Bitterness and Acidity
 
 ```{r bitterness}
+#| label: fig-bitter
 #| fig-height: 2.5
 #| fig-cap: "Coffee Bitterness Scores"
 bitter_count <- purrr::map(
@@ -254,6 +309,7 @@ purrr::reduce(bitter_count, bind_rows) |> tidyr::pivot_longer(cols = "type") |> 
 ```
 
 ```{r acidity}
+#| label: fig-acid
 #| fig-height: 2.5
 #| fig-cap: Coffee Acidity Scores
 acid_count <- purrr::map(
@@ -265,9 +321,6 @@ purrr::reduce(acid_count, bind_rows) |> tidyr::pivot_longer(cols = "type") |> mu
 ```
 
 ```{r means}
-#| fig-subcap: 
-#|   - sub1
-#|   - sub2
 mean_bitter = purrr::map(
     c("coffee_a_bitterness", "coffee_b_bitterness", "coffee_c_bitterness", "coffee_d_bitterness"),
     ~ summarize(df, "Mean Bitterness" = mean(.data[[.x]], na.rm =TRUE), "Standard Deviation" =sd(.data[[.x]], na.rm =TRUE)) |> mutate(Coffee = paste("Coffee",toupper(substr(.x, 8,8))))
@@ -281,20 +334,42 @@ mean_acid = purrr::map(
 ) |> bind_rows()
 
 acid_table = mean_acid |>  gt() |> gt_theme_538() |> gt_add_coffee_color("Coffee") |> gt::fmt_number() |> cols_move(c("Mean Acidity", "Standard Deviation"), after = "Coffee")
-bitter_table
-acid_table
+# bitter_table
+# acid_table
 # gtExtras::gt_two_column_layout(list(bitter_table, acid_table))
 ```
 
+:::: {.columns}
+::: {.column width="48%"}
+```{r}
+#| label: tbl-bitterstats
+#| tbl-cap: Bitterness Statistics of Each Coffee
+as_raw_html(bitter_table)
+```
+:::
+::: {.column width="4%"}
+:::
+::: {.column width="48%"}
+```{r}
+#| label: tbl-acidstats
+#| tbl-cap: Acidity Statistics of Each Coffee
+as_raw_html(acid_table)
+```
+:::
+::::
+
 ```{r ttests}
-#| fig-subcap: "conf.level = 0.95, statistical significant at the 5 percent levels"
+#| label: tbl-ttest
+#| tbl-cap: "conf.level = 0.95, statistical significant at the 5 percent levels"
 bc_ttest = t.test(df[, coffee_c_bitterness], df[, coffee_b_bitterness], alternative = "greater")
 ad_ttest = t.test(df[, coffee_d_bitterness], df[, coffee_a_bitterness], alternative = "greater")
 # scales::comma(bc_ttest$p.value, accuracy = .001)
 ad_acid_test = t.test(df[, coffee_d_acidity], df[, coffee_a_acidity], "greater")
 bc_acid_test = t.test(df[, coffee_c_acidity], df[, coffee_b_acidity], "greater")
 # conf.level = 0.95, statistical significane at the 5 percent levels
-data.frame("Type" = c("Bitterness"), "H0 Coffee" = c("Coffee A > Coffee B"), type= "Greater Avg", "p-value for t-test" = c(bc_ttest$p.value)) |> gt()
+# data.frame("Type" = c("Bitterness"), "H0" = c("Coffee A > Coffee B"), "H1" type= "Greater Avg") |> gt()
+
+purrr::map_df(list(bc_ttest, ad_ttest, ad_acid_test, bc_acid_test), broom::tidy) |> select(statistic, p.value) |> gt() |> fmt_number(decimals = 4)
 ```
 
 To start, participants were asked to rate the level of bitterness and acidity of each coffee from a scale of 1 -5. Average bitterness among the four coffees show that [Coffee A]{.coffeea} and [Coffee D]{.coffeed} were similar while [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} were also similar. But are these averages between these two pair of coffee statistically significant. To find this out, I performed a one-sided t-test. show that the average may be different (p = xx).
@@ -332,10 +407,9 @@ Participants were asked to describe the coffee flavors in an open text field. I 
 <iframe src = "/assets/widgets/d.html" width = "100%" height = "200"></iframe></div>
 </div>
 
-Okay - so let's see how these tasting notes match up on the flavor wheel. 'Acid', 'Bitter', 'Sweet', 'Fruity', and 'Chocolate' are generic words used to describe all 4 coffees. However, they were used at different frequencies as demonstrated in the word clouds. Looking at the yellow sectors, we do see a pattern for [Coffee A]{.coffeea} and [Coffee D]{.coffeed} compared to [Coffee B]{.coffeeb} and [Coffee C]{.coffeec}. 
+Okay - so let's see how these tasting notes match up on the flavor wheel. ['Acid', 'Bitter', 'Sweet', 'Fruity',]{.coffeeother} and ['Chocolate']{.coffeeother} are generic words used to describe all 4 coffees. However, they were used at different frequencies as demonstrated in the word clouds. Looking at the yellow sectors, we do see a pattern for [Coffee A]{.coffeea} and [Coffee D]{.coffeed} compared to [Coffee B]{.coffeeb} and [Coffee C]{.coffeec}. 
 
 ```{r text analysis}
-#| fig-cap: Most common words for Coffee D
 coffee_a_words = count_cupping_notes(df$coffee_a_notes, count_min = 20)
 coffee_b_words = count_cupping_notes(df$coffee_b_notes, count_min = 20)
 coffee_c_words = count_cupping_notes(df$coffee_c_notes, count_min = 20)
@@ -344,6 +418,7 @@ coffee_d_words = count_cupping_notes(df$coffee_d_notes, count_min = 20)
 ```
 
 ```{r}
+#| label: fig-tastenotes
 #| fig-cap: "Overlapping Taste Notes"
 all_top = purrr::reduce(
   list(
@@ -363,24 +438,6 @@ all_top |> coffee_words_join(cup_notes, color = "#e5e5e5") |>
   coffee_sunburst(mcolor = ~color2, hover = ~match_coffee)
 ```
 
-```{r}
-#| layout-ncol: 2
-#| eval: false
-#| height: 400px
-
-  cup_notes <-
-    cup_notes |> mutate(new_label = paste0(
-      "<b>",
-      end_name,
-      ": ",
-      "</b>",
-      ifelse(is.na(labels), "", stringr::str_wrap(labels, width = 30))
-    ))
-
-coffee_a_words[1:25] |> prepare_words(color = "#ff3d19") |> coffee_words_join(cup_notes, color = "#e5e5e5") |> coffee_sunburst()
-coffee_b_words[1:25] |> prepare_words(color = "#ff3d19") |> coffee_words_join(cup_notes, color = "#e5e5e5") |> coffee_sunburst()
-```
-
 ## Which Was the Best?
 None.
 
@@ -388,6 +445,7 @@ None.
 [^2]: https://www.statista.com/statistics/810461/us-youtube-reach-gender/
 
 ```{r}
+#| label: fig-fav_exp
 #| fig-height: 2.5
 #| fig-cap: Favorite Coffee by Experience Group
 df |> count(exp_group, lastly_what_was_your_favorite_overall_coffee) |>
@@ -396,10 +454,8 @@ df |> count(exp_group, lastly_what_was_your_favorite_overall_coffee) |>
   gg_bars( "exp_group", "perc", "lastly_what_was_your_favorite_overall_coffee") + facet_grid(~lastly_what_was_your_favorite_overall_coffee) + scale_color_manual(values = coffee_pal) + scale_fill_manual(values = coffee_pal)
 ```
 
-
 ```{r}
+#| label: fig
 #| eval: false
 # df |> filter(exp_group != "") |>  count(before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like, exp_group) |> group_by(exp_group) |> mutate(perc = n / sum(n)) |> ggplot(aes(before_today_s_tasting_which_of_the_following_best_described_what_kind_of_coffee_you_like, perc)) + geom_col() + facet_grid(rows = vars(exp_group)) + theme_coffee(8)
 ```
-
-
