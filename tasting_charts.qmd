@@ -13,6 +13,8 @@ some may say 'coffee snobs'? Who are they and what are the trends we see
 today? Let's find out!
 Admittedly, this is a greatly biased sample of coffee enthusiasts most
 likely those leaning who watch YouTube.
+Roast levels, processing method, region, elevation, variety, all play a role in the coffee tasting experience.   
+To ensure every participant tasted nearly the exact same coffee profile, coffee pods were shipped flash frozen liquid of concentrated coffee, needing only to add hot water.
 
 ```{r}
 library(plotly)
