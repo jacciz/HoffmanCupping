@@ -103,19 +103,19 @@ df = df |> mutate_at(
 )
 ```
 
-The "Great America Taste Test" is what coffee expert and British **YouTuber James
+The "Great America Taste Test" is what coffee expert and British YouTuber **James
 Hoffman** called the [live stream coffee tasting event](https://www.youtube.com/watch?v=U489K2t_Tgc&t) held in October
-2023. 5,000 Americans participated in this simultaneous coffee sipping event where each participant tasted the same four coffees. They were then asked to fill out a survey of around 100 questions ranging from coffee drinking habits to describing the coffee flavors of the four coffees.
+2023. 5,000 Americans participated in this simultaneous coffee sipping event where each participant tasted the same four coffees. They were then asked to fill out a survey of around 100 questions ranging from coffee drinking habits to describing the coffee flavors of the tested coffees. Of the 5,000 participants, 4,042 surveys were completed.
 
 ![](assets/maxresdefault.jpg){.centerimg height=250px}
 
-Being a coffee nerd, I decided to analyze the results! James did do a [follow-up video](https://www.youtube.com/watch?v=bMOOQfeloH0&t) on his own analysis on the survey so I don't want to overlap too much on his findings.
+Being a coffee nerd and a data analyst, I decided to analyze the results! James did do a [follow-up video](https://www.youtube.com/watch?v=bMOOQfeloH0&t) on his own analysis on the survey so I don't want to overlap too much on his findings.
 
-So I performed a text analysis of the coffees tasted and looked at the demographics and coffee habits of the participants. Here I looked at standard bitterness and acidity in each coffee then I went deeper to find if there were commonalities in coffee flavor notes via a text analysis. Of the 5,000 participants, 4,042 surveys were completed.
+I'll go through the participant demographics, spending habits, coffee preferences, and coffee tasting. I looked at how *bitterness* and *acidity* was rated in each coffee then I went deeper to find if there were commonalities in coffee flavor notes via a text analysis. 
 
 ## So What Were The Four Coffees?
 
-The four different coffees, @tbl-fourcoffees, were each of a different roast: light, medium, and dark. The fourth coffee, [Coffee D]{.coffeed}, was a light roast coffee but with a unique processing method. The method was anaerobic natural fermentation, meaning that coffee cherries are kept in a closed container with no oxygen as to allow for fermentation of the raw coffee beans - this tends to give the coffee a heavy fruity and fermented taste.
+The four different coffees, @tbl-fourcoffees, were each of a different roast: light, medium, and dark. The fourth coffee, [Coffee D]{.coffeed}, was a light roast coffee but with a unique processing method. The method was anaerobic natural fermentation, meaning that coffee cherries were kept in a closed container with no oxygen as to allow for fermentation of the raw coffee beans - this tends to give the coffee a heavy fruity and fermented taste. Yum!
 
 ```{r}
 #| label: tbl-fourcoffees
@@ -132,7 +132,7 @@ Nearly 3 out of 4 (74%) participants were between ages 25 and 44 years (@tbl-age
 
 :::: {.columns}
 ::: {.column width="45%"}
-I also looked at the breakdown of daily coffee drinking by age in @tbl-age_habit. Interestingly, we see a trend in drinking more coffee per day as one ages. Who said college students drink lots of coffee, maybe we should say it's the retirees who drink far more because of their spare time?
+I also looked at the breakdown of daily coffee drinking by age in @tbl-age_habit. Interestingly, we see a trend in drinking more coffee per day as one ages. Who said college students drink lots of coffee, maybe we should say it's the retirees who drink far more because of their greater spare time?
 :::
 ::: {.column width="55%"}
 
@@ -198,7 +198,7 @@ df |> filter(!is.na(exp_group)) |> count(exp_group) |> mutate(perc = n / sum(n))
 
 :::: {.columns}
 ::: {.column width="50%"}
-Let's explore the coffee drinking habits by expertise group. @fig-drink_exp shows a trend in increasing coffee consumption as one learns more about coffee. Some even drinking 4 or more cups per day with nearly 1 out of 10 participants for the '9-10' expertise group. There's a similar pattern with drinking coffee just black - meaning no milk, sugar, or other additive (like olive oil, gross).
+Let's explore the coffee drinking habits by expertise group. @fig-drink_exp shows a trend in increasing coffee consumption as one learns more about coffee. Some even drinking 4 or more cups per day with nearly 1 out of 10 participants for the '9-10' expertise group. @fig-drink_black shows a similar correlation in  which participants tend drink coffee just black - meaning no milk, sugar, or other additive (like olive oil, gross) - as one gets more knowledgeable.
 :::
 ::: {.column width="50%"}
 ```{r}
@@ -210,14 +210,14 @@ df |> filter(!is.na(just_black), !is.na(exp_group)) |> count(just_black, exp_gro
 :::
 ::::
 
-@fig-favorite shows that a pour over is up to 8x more likely to be consumed by those with more coffee expertise compared to those with little expertise. Pour over is my daily driver to brew coffee every morning. Interestingly, participants across all expertise groups consistently drink regular drip coffee- I suppose that method is still very quick and convenient whether drinking at home, buying from a gas station, or at work. Admittedly, I'm still confused how an 'expert' coffee drinker says their favorite coffee comes from a drip coffee as this method allows for the least control over variables that make great coffee. 
-
 ```{r}
 #| label: fig-drink_exp
 #| fig-height: 2.5
 #| fig-cap: Daily Coffee Drinks by Expertise Group
 df |>  filter(!is.na(total_cups), !is.na(exp_group)) |> count(total_cups, exp_group) |> group_by(exp_group) |> mutate(perc = n / sum(n)) |> gg_bars( "exp_group", "perc", single_color = TRUE, bar_color = "steelblue") + facet_grid(~total_cups)
 ```
+
+@fig-favorite shows that a pour over is up to 8x more likely to be consumed by those with more coffee expertise compared to those with little expertise. Perhaps this explains why so many prefer to drink coffee black - pour overs tend to use light roast beans as they tend to retain more of their origin flavor and unique elements. A pour over is my daily driver to brew coffee every morning. Interestingly, participants across all expertise groups consistently drink regular drip coffee- I suppose that method is still very quick and convenient whether drinking at home, buying from a gas station, or brewing at work. Admittedly, I'm still confused how an 'expert' coffee drinker says their favorite coffee comes from a drip coffee as this method allows for the least control over variables that make great coffee. 
 
 ```{r}
 #| label: fig-favorite
@@ -232,7 +232,7 @@ As one would expect, as one becomes more experienced in a hobby, one spends more
 
 For the folks with less expertise, nearly half (48%) of them spend less than \$20 a month. @fig-drink_exp shows that this group typically drinks far less coffee with most (74%) drinking 0-1 cups per day. Given their low spending, they probably don't drink a lot of specialty coffee since a bag of beans costs \$10-20 nor drink coffee at specialty cafes too often.
 
-We find similar a pattern in low spending when asked how much a participant spent on coffee equipment over the past five years. While James says having a good coffee grinder can greatly improve a cup of coffee, a quality one typically costs more than $100. This implies these folks probably make terrible coffee with a drip coffee maker, but who am I to judge?
+We find similar a pattern in low spending when asked how much a participant spent on coffee equipment over the past five years. While James says having a good coffee grinder can greatly improve a cup of coffee, a quality burr grinder typically costs more than $100. This implies these folks probably make terrible coffee with a drip coffee maker, but who am I to judge?
 
 For the upper end - the '9-10' expertise group, most (94%) spend at least $20 a month and over half (58%) have spent over \$1,000 over the past 5 years on coffee equipment. Given that this group is much more likely to drink pour over - a method where one may own a goose neck electric kettle, coffee scale, Chemex, and a decent grinder which can easily add up to a few hundred dollars. And they are also more likely to drink espresso (@fig-favorite) in which they may own an espresso machine at home, a machine that can easily cost over \$1,000.
 
@@ -263,20 +263,20 @@ df |> filter(!is.na(exp_group), !is.na(spend_5_years)) |> count(spend_5_years, e
 Most of us have probably seen tasting notes when purchasing coffee (i.e. grapefruit, chocolate) and the roast level but are these descriptors actually helpful? Would someone describe similar notes of the same coffee?
 
 ![James Slurping One Coffee](assets/james_slurp.png){.centerimg height=250px}
-Participants tasted the coffee via coffee cupping, a coffee tasting technique where a taster takes and spoonful of coffee a slurps it as to asses aspects such as cleanness, sweetness, acidity, mouthfeel and aftertaste as in the above picture. But why the slurp? Slurping aerates the coffee as it makes contact with taste buds which intensifies the tasting sensation. Swishing it over the whole mouth coats all areas of the tongue, the front sweet, sides sour and back bitter as to assess all aspects of taste.
+Participants tasted the coffee via coffee cupping, a coffee tasting technique where a taster takes and spoonful of coffee and slurps it as to asses aspects such as cleanness, sweetness, acidity, mouthfeel and aftertaste as in the above picture. But why the slurp? Slurping aerates the coffee as it makes contact with taste buds which intensifies the tasting sensation.
 
-To find this out, I looked at how participants ranked the level of bitterness and acidity of each coffee. Then they were asked to write down tasting notes so I will explore this via a text analysis to identify the top **flavor notes** used to describe each coffee.
+To answer these questions, I looked at how participants ranked the level of bitterness and acidity of each coffee. Then they were asked to write down tasting notes so I will explore this via a text analysis to identify the **top flavor notes** used to describe each coffee.
 
 ### Bitterness and Acidity
-Participants were asked to rate the level of **bitterness** and **acidity** of each coffee on a scale of 1-5. @tbl-bitterstats and @tbl-acidstats shows the distribution of this 5-point scale. We see [Coffee A]{.coffeea}/[Coffee D]{.coffeed} and [Coffee B]{.coffeeb}/[Coffee C]{.coffeec} had a similar average and similar distribution for both **bitterness** and **acidity.**
+Participants were asked to rate the level of **bitterness** and **acidity** of each coffee on a scale of 1-5. @tbl-bitterstats and @tbl-acidstats shows the average and the distribution of this 5-point scale. We see ([Coffee A]{.coffeea} and [Coffee D]{.coffeed}) and ([Coffee B]{.coffeeb} and [Coffee C]{.coffeec}) showed a similar average and similar distribution for both **bitterness** and **acidity.**
 
 To find if these differences were statistically different these two pairs of coffee, I performed a one-sided t-test with a 95\% confidence level.
 
-For bitterness, I found that [Coffee C]{.coffeec} was more bitter than [Coffee B]{.coffeeb} (p=0.005) and [Coffee D]{.coffeed} was not more bitter than [Coffee A]{.coffeea} (p=0.178). We can statistically say the order of bitterness: 
+For bitterness, I found that [Coffee C]{.coffeec} was statically more likely to be bitter than [Coffee B]{.coffeeb} (p=0.005) and [Coffee D]{.coffeed} was not more bitter than [Coffee A]{.coffeea} (p=0.178). We can statistically say the order of bitterness: 
 
 [Coffee C]{.coffeec} > [Coffee B]{.coffeeb}> [Coffee A]{.coffeea}/[Coffee D]{.coffeed}
 
-For acidity, I found that [Coffee D]{.coffeed} was more acidic than [Coffee A]{.coffeea} (p=0) and [Coffee C]{.coffeec} was more acidic than [Coffee B]{.coffeeb} (p=0).
+For acidity, I found that [Coffee D]{.coffeed} was statically more likely to be more acidic than [Coffee A]{.coffeea} (p=0) and [Coffee C]{.coffeec} was statically more likely to be more acidic than [Coffee B]{.coffeeb} (p=0). Again, we can statistically say the order of acidity: 
 
 [Coffee D]{.coffeed} > [Coffee A]{.coffeea} > [Coffee C]{.coffeec} > [Coffee B]{.coffeeb}
 
@@ -405,10 +405,10 @@ data.frame(
 
 Cool we found a correlation in bitterness and acidity in the coffees! Let's dig deeper into what the coffee tasted like, as described by the participants. So ***What does the coffee remind you of?*** was a repeated question James asked to describe the flavor notes during the live stream. Coffee tastes like coffee, but there are nuances in the flavor notes that have a similar mouthfeel as other foods.
 
-Comparing coffees side-by-side allows one to discover the nuances of each coffee. One may start with a general words such as 'nutty' but then move on to identify which type of nut. Below is a coffee flavor wheel[^3], a tool to help identify words for one's taste buds (note this was NOT used during the live event).
+Comparing multiple coffees side-by-side allows one to discover the nuances of each coffee. One may start with a general words such as *nutty* but then move on to identify which type of nut. Below is a coffee flavor wheel[^3], a tool to help identify words for one's taste buds (this wheel was NOT used during the live event).
 
 ```{r}
-#| fig-cap: Coffee Flavor Wheel (Hover to read descriptions)
+#| fig-cap: "Coffee Flavor Wheel (Hover to read descriptions)"
 cup_notes <-
   cup_notes |> mutate(new_label = paste0(
     "<b>",
@@ -421,29 +421,29 @@ left_join(cup_notes, y = match_colors, by = c("end_name" = "ids")) |>
   coffee_sunburst(mcolor = ~ color2, hover = ~ new_label)
 ```
 
-Participants were asked to describe the coffee flavors in an open text field. After some cleaning of these words, I performed a text analysis by identifying and counting key flavor words, such as *bright* or *grapefruit.* I took the **top 25 most frequent words** of each coffee and created a **word cloud.** The larger the word, the frequent the word was mentioned (note: the count of each word is in the hover text).
+Participants were asked to describe the coffee flavors in an open text field. After some cleaning of these words, I performed a text analysis to identify and count key flavor words, such as *bright* or *grapefruit.* I took the **top 25 most frequent words** of each coffee and created a **word cloud.** The larger the word, the frequent the word was mentioned (the count of each word is in the hover text).
 
 <div id="parent">
 <div id="child-left">
-<p class="wc_cap">[Coffee A]{.coffeea}: Top Word was **Fruity** with 616 Respondents</p>
+<p class="wc_cap">[Coffee A]{.coffeea}: Top Word was **Fruity** with 616 Mentions</p>
 <iframe src = "/assets/widgets/a.html" width = "100%" height = "200"></iframe></div>
 <div id="child-right">
-<p class="wc_cap">[Coffee B]{.coffeeb}: Top Word was **Chocolate** with 600 Respondents</p>
+<p class="wc_cap">[Coffee B]{.coffeeb}: Top Word was **Chocolate** with 600 Mentions</p>
 <iframe src = "/assets/widgets/b.html" width = "100%" height = "200"></iframe></div>
 </div>
 
 <div id="parent">
 <div id="child-left">
-<p class="wc_cap">[Coffee C]{.coffeec}: Top Word was **Chocolate** with 332 Respondents</p>
+<p class="wc_cap">[Coffee C]{.coffeec}: Top Word was **Chocolate** with 332 Mentions</p>
 <iframe src = "/assets/widgets/c.html" width = "100%" height = "200"></iframe></div>
 <div id="child-right">
-<p class="wc_cap">[Coffee D]{.coffeed}: Top Word was **Fruity** with 1,085 Respondents</p>
+<p class="wc_cap">[Coffee D]{.coffeed}: Top Word was **Fruity** with 1,085 Mentions</p>
 <iframe src = "/assets/widgets/d.html" width = "100%" height = "200"></iframe></div>
 </div>
 
-[Coffee A]{.coffeea} conjures up images of something *light*, *bright* and *fruity.* While participants described [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} as *chocolate*, *nutty*, and *balanced* and even a few even described it as *burnt*. [Coffee C]{.coffeec} had more of an even spread in word counts as words are similar in size. [Coffee D]{.coffeed}, however, paints a much different image. *Fermented* and *funky* made it to the top - given this was a fermented natural processed coffee, this is not surprising!
+For me, [Coffee A]{.coffeea} conjures up images of something *light*, *bright* and *fruity.* While participants described [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} as *chocolate*, *nutty*, and *balanced* and even a few described them as *burnt*. [Coffee C]{.coffeec} had more of an even spread in word counts as words are similar in size. [Coffee D]{.coffeed}, however, paints a much different image. *Fermented* and *funky* made it to the top - given this was a fermented natural processed coffee, this is not surprising!
 
-Okay - so let's see how these tasting notes match up on the flavor wheel below. ['Acid', 'Bitter', 'Sweet', 'Fruity',]{.coffeeother} and ['Chocolate']{.coffeeother} are generic words used to describe all 4 coffees, though at different frequencies as demonstrated in the word clouds. We do see a pattern for [Coffee A]{.coffeea} and [Coffee D]{.coffeed}, in [**yellow**]{style="color:#A65628;"}, compared to [Coffee B]{.coffeeb} and [Coffee C]{.coffeec}, in [**brown**]{style="color:#A65628;"}, in that the formal is described as much more fruity and floral as opposed to roasted and smoky. [Coffee D]{.coffeed} was described by many specific types of berries.
+Okay - so let's see how these top 25 tasting notes match up to the flavor wheel. ['Acid', 'Bitter', 'Sweet', 'Fruity',]{.coffeeother} and ['Chocolate']{.coffeeother} are generic words used to describe all 4 coffees, though at different frequencies as demonstrated in the word clouds. We do see a pattern for [Coffee A]{.coffeea} and [Coffee D]{.coffeed}, in [**yellow**]{style="color:#A65628;"}, compared to [Coffee B]{.coffeeb} and [Coffee C]{.coffeec}, in [**brown**]{style="color:#A65628;"}, in that the former is described as much more *fruity* and *floral* as opposed to *roasted* and *smoky.* [Coffee D]{.coffeed} was described by many specific types of berries.
 
 ```{r text analysis}
 coffee_a_words = count_cupping_notes(df$coffee_a_notes, count_min = 20)
@@ -474,7 +474,7 @@ all_top |> coffee_words_join(cup_notes, color = "#e5e5e5") |>
   coffee_sunburst(mcolor = ~color2, hover = ~match_coffee)
 ```
 
-### Taste Preferences
+### Coffee Preferences
 
 ```{r}
 #| label: fig-fav_exp
@@ -485,11 +485,11 @@ df |> count(exp_group, lastly_what_was_your_favorite_overall_coffee) |>
   reframe(perc = n/sum(n),lastly_what_was_your_favorite_overall_coffee, .by = exp_group)  |>
   gg_bars( "exp_group", "perc", "lastly_what_was_your_favorite_overall_coffee") + facet_grid(~lastly_what_was_your_favorite_overall_coffee) + scale_color_manual(values = coffee_pal) + scale_fill_manual(values = coffee_pal)
 ```
-So going back to expertise groups, let's see if there's a correlation in preference of coffee. Participants were asked to describe their coffee preference before the day's tasting: @tbl-heatmap is a heatmap of breakdowns of these preferences by expertise group. @fig-fav_exp above is a breakdown of favorite coffee by expertise group.
+So going back to expertise groups, let's see if there's a correlation in preference of coffee. Participants were asked to describe their coffee preference before the day's tasting: @tbl-heatmap below is a heatmap of breakdowns of these preferences by expertise group. @fig-fav_exp above is a breakdown of favorite coffee by expertise group.
 
-We see those with expertise '1-2' and '3-4' have a preference for *chocolatey* coffee. As we've previously seen in the word clouds, *chocolate* was describe in [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} while latte was also their favorite coffee for many of these folks, a drink that typically uses a medium or dark roast coffee. So it makes sense to see their favorite coffee was either [Coffee B]{.coffeeb} or [Coffee C]{.coffeec}.
+We see those with expertise '1-2' and '3-4' have a preference for *chocolatey* coffee. As we've previously seen in the word clouds, *chocolate* was the number one word mentioned for [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} and a latte was the top coffee for many of these folks (@fig-favorite), a drink that typically uses a medium or dark roast coffee. So it makes sense to see their favorite coffee was either [Coffee B]{.coffeeb} or [Coffee C]{.coffeec}.
 
-As for the '7-8' and '9-10' expertise groups, many have a preference for *fruity* coffees while nearly half had a preference for [Coffee D]{.coffeed} with [Coffee A]{.coffeea} coming up second. Given that around 40% of this group prefers a pour over, a coffee that typicaly uses a lighter roast, this also makes sense.
+As for the '7-8' and '9-10' expertise groups, many have a preference for *fruity* and *juicy* coffee. Around 40% of these groups have pour over (@fig-favorite) as their preferred drink, a drink that typically uses a lighter roast. It makes sense their favorite drink is a light roast. Though it's interesting that many prefer the more exotic of the two with nearly half had a preference for [Coffee D]{.coffeed}.
 ```{r}
 #| label: tbl-heatmap
 #| tbl-cap: Heatmap of Coffee Preferences Before Tasting by Expertise Group
@@ -522,3 +522,7 @@ fav_flavr_exp |> select(-n) |> tidyr::pivot_wider(names_from = exp_group, values
 
 ## Conclusion
 This cupping live stream demonstrates there's actually some commonalities between tasting by the cupping participants. [Coffee A]{.coffeea} and [Coffee D]{.coffeed} were both fruity, while [Coffee D]{.coffeed} was described as 'fermented'. [Coffee B]{.coffeeb} and [Coffee C]{.coffeec} also had similar flavor notes, but [Coffee C]{.coffeec} was statistically described as being more bitter, on average. This analysis also demonstrates there's not much flavor differences in medium and dark roasts as compared to light roasts given that similar words were used to describe [Coffee B]{.coffeeb} and [Coffee C]{.coffeec}.
+
+Now time to make a pour over!
+
+![](assets/pexels-photo-4350071.jpeg){.centerimg height=250px}
